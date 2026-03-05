@@ -13,8 +13,9 @@ These aren't report templates or document checklists. They encode the judgment c
 | Skill | Purpose | Status |
 |-------|---------|--------|
 | [status-report-drafter](status-report-drafter/) | Transforms emails, call notes, and updates into structured status reports with RAG ratings, variance commentary, and escalation flags | v1 — tested against synthetic scenarios |
+| [risk-and-issues-manager](risk-and-issues-manager/) | RAID log methodology with decision extraction from emails and meeting notes. Captures risks, actions, issues, and decisions — including the ones buried in email chains that nobody recorded | v1 — tested against synthetic scenarios |
 
-More skills are in development covering risk and issues management, scope change control, and matter intake scoping.
+More skills are in development covering scope change control and matter intake scoping.
 
 ## How to install
 
