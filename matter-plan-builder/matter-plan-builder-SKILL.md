@@ -89,7 +89,7 @@ Flag dependencies explicitly. Three types matter in legal work:
 **Information dependencies** — X cannot proceed without confirmation from an external party: a regulatory body, the counterparty, a tax authority, a client internal team. These are the most dangerous because their duration is outside the firm's control. For every information dependency: who is providing it, what is the expected lead time, and what is the downstream impact if delayed by two weeks / four weeks.
 
 ### Step 4: Assign owners
-Every workstream needs a single named owner. Not "Baker McKenzie team" — a person. Not "local counsel" — a named firm and, where known, a named individual. Ownership without accountability is a workstream that will drift.
+Every workstream needs a single named owner. Not "the London team" — a person. Not "local counsel" — a named firm and, where known, a named individual. Ownership without accountability is a workstream that will drift.
 
 Below the workstream owner: identify whether each workstream has sufficient resource at the right level. Gearing matters — a workstream staffed only with senior associates will be expensive and slow on routine tasks; a workstream with no senior resource will escalate everything. Flag gearing concerns; resource-planner handles the detailed analysis.
 
