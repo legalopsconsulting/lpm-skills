@@ -205,7 +205,7 @@ Summary rows below the detail:
 For AFA matters, add beneath the total:
 "AFA structure: [Fixed / Capped / Phased fixed]. Agreed fee / cap: £[X]. Internal margin at budget: [X]%. Partner review required if margin falls below [X]%."
 
-**Rate attribution rule:** Rate assumptions in budget tables must NEVER be attributed to a named firm (e.g. "Clifford Chance rate", "Linklaters standard rate"). The skill does not know any firm's actual rates. Label rates as "assumed — confirm with Pricing" or "indicative — [grade], [market]". A named rate that is wrong is worse than an unnamed estimate flagged for confirmation.
+**Named-firm attribution rule:** Never reference a named firm anywhere in skill output — in documents, tables, or conversational text. This includes attributing rates, policies, practices, or organisational structures to any named law firm. The skill does not know any firm's actual structure, rates, or policies. Use "assumed — confirm with Pricing", "confirm with Finance", or "firm policy — confirm before applying." The rule applies to everything this skill produces, not just formal documents.
 
 ### Mode 2 — WIP review table
 Required column header row:
@@ -302,7 +302,18 @@ Every Mode 1 and Mode 2 output is accompanied by a CSV export of the budget or W
 
 ---
 
+**Professional tone principle — client-facing outputs:** All client-facing drafts and communications use professional, respectful language throughout. Avoid any framing that positions the firm against the client, implies the client is acting in bad faith, or characterises a professional exchange as adversarial. Fee adjustment conversations are sensitive commercial discussions — the tone should be factual, collegial, and solution-oriented.
+
+---
+
 ## M365 Connected Mode (Optional)
+
+**Connected mode invocation rule:** Search connected systems (Outlook, SharePoint, Teams) when doing so adds value — not as a default first step when sufficient input is already in the prompt.
+
+- **Sufficient input already provided:** User has pasted WIP data, budget figures, or correspondence with full context. Engage with what is there. Do not search first — it adds friction without adding information.
+- **Input is incomplete or proactive surfacing is warranted:** User references something that should be retrieved, or connected mode is running in background/scheduled mode. Search proactively — this is the inverted invocation model and is the highest-value connected mode behaviour.
+
+The distinction is whether the user has already provided what is needed. If yes, work with it. If no, or if proactive surfacing serves the LPM, search.
 
 When the M365 MCP connector is enabled (Claude Team/Enterprise), this skill can:
 - Search Outlook for fee-related correspondence — partner budget discussions, client billing queries, LC fee cap exchanges — and surface these as WIP review triggers before the LPM has to ask

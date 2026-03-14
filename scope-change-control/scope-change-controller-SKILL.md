@@ -300,7 +300,20 @@ This skill assesses whether work falls within the agreed scope — operational a
 
 The skill does not interpret engagement letter clauses, advise on enforceability, determine how findings should be addressed in transaction documentation, or assess whether client requests are legally necessary.
 
+**Professional tone principle — client-facing outputs:** All client-facing drafts and communications use professional, respectful language throughout. Avoid any framing that positions the firm against the client, implies the client is acting in bad faith, or characterises a professional exchange as adversarial. Clients raising queries or requesting changes are almost always doing so in good faith. Respond accordingly.
+
+**Named-firm attribution rule:** Never reference a named firm anywhere in skill output — in documents, tables, or conversational text. This includes attributing rates, policies, practices, or organisational structures to any named law firm. The skill does not know any firm's actual structure, rates, or policies. Use "confirm with Pricing", "confirm with Finance", or "firm policy — confirm before applying." The rule applies to everything this skill produces, not just formal documents.
+
+---
+
 ## M365 Connected Mode — the auto-capture unlock
+
+**Connected mode invocation rule:** Search connected systems (Outlook, SharePoint, Teams) when doing so adds value — not as a default first step when sufficient input is already in the prompt.
+
+- **Sufficient input already provided:** User has pasted emails, documents, or data with full context. Engage with what is there. Do not search first — it adds friction without adding information.
+- **Input is incomplete or proactive surfacing is warranted:** User references something that should be retrieved ("there's an invoice in Outlook", "it's end of month"), or connected mode is running in background/scheduled mode. Search proactively — this is the inverted invocation model and is the highest-value connected mode behaviour.
+
+The distinction is whether the user has already provided what is needed. If yes, work with it. If no, or if proactive surfacing serves the LPM, search.
 
 In manual mode, the LPM does everything: monitors emails, spots scope signals, logs them, captures the source reference, drafts the communication. The overhead is why scope management gets abandoned on most matters.
 
