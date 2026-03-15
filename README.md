@@ -20,6 +20,8 @@ These aren't report templates or document checklists. They encode the judgment c
 | [timeline-generator](timeline-generator/) | Builds a dependency network and critical path from a matter plan. Produces an interactive Gantt, identifies near-critical tasks, and runs what-if cascade analysis when delays occur | v1 — tested |
 | [budget-and-fee-manager](budget-and-fee-manager/) | Matter budgeting and ongoing WIP monitoring — phase-based fee estimates, proportionality analysis, variance commentary, forecast-to-complete, AFA tracking, and realisation analysis | v1 — tested |
 | [billing-cycle-manager](billing-cycle-manager/) | Operational billing execution — monthly bill preparation, local counsel invoice review and disbursement treatment, client billing query responses, cashflow modelling, and leverage and burn analysis | v1 — tested |
+| [stakeholder-comms-planner](stakeholder-comms-planner/) | Stakeholder mapping, communication plan design, reporting hierarchy for multi-jurisdiction programmes, and mid-matter comms updates when the stakeholder landscape changes | v1 — tested |
+| [resource-planner](resource-planner/) | Team structure, gearing analysis, continuity planning, and competing demand management. Translates scope into a required grade mix, identifies where work is being done at the wrong level, and models resourcing conflicts across matters | v1 — tested |
 
 ## How to install
 
@@ -27,11 +29,12 @@ Download the skill folder and upload it to Claude via **Settings → Capabilitie
 
 ## Status
 
-Eight skills built and Phase 2 tested against realistic synthetic scenarios. All skills updated 14 March 2026 to apply consistent cross-skill standards:
+Ten skills built and Phase 2 tested against realistic synthetic scenarios. Skills updated 14–15 March 2026 to apply consistent cross-skill standards:
 
 - **Named-firm attribution rule** — skill outputs never attribute rates, policies, or practices to a named law firm, in documents or conversational text
 - **Connected mode invocation rule** — connected mode (Outlook, SharePoint, Teams) supplements manual input rather than replacing it; proactive surfacing is preserved where it adds value
 - **Professional tone principle** — all client-facing outputs use professional, respectful language; no adversarial framing in billing queries, scope conversations, or fee discussions
+- **Summary label standard** — all skill outputs use "Summary" as the reader-facing section heading; BLUF (Bottom Line Up Front) is the internal design principle, not a heading the reader sees
 
 These skills have been tested against realistic synthetic scenarios but not yet battle-tested on live matters. Feedback is welcome — particularly the "this doesn't work because..." kind.
 
