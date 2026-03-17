@@ -1,0 +1,9 @@
+{
+  "name": "lpm-skills",
+  "version": "1.0.0",
+  "description": "14 skills encoding legal project management methodology — the operational layer covering the full LPM lifecycle from matter setup through execution, financial management, team coordination, and close. Practice-area agnostic. Works on any legal matter type.",
+  "author": "Scott Margetts / LegalOps Consulting Limited",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/legalopsconsulting/lpm-skills",
+  "contact": "https://www.linkedin.com/in/scottmargetts/"
+}
