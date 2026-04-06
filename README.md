@@ -85,20 +85,6 @@ These skills encode general operational methodology for educational and experime
 
 Apache 2.0 — see [LICENSE](LICENSE) for details.
 
----
-
-## Licensing
-
 This version (v1) is released under the Apache 2.0 licence. You are free to use, adapt, and build on these skills, including for commercial purposes, subject to the attribution requirements in the NOTICE file.
 
 Future versions of this plugin will be released under AGPL-3.0. Any product built on top of those versions will be required to be open source under the same licence.
-
-
----
-
-## Licensing
-
-This version (v1) is released under the Apache 2.0 licence. You are free to use, adapt, and build on these skills, including for commercial purposes, subject to the attribution requirements in the NOTICE file.
-
-Future versions of this plugin will be released under AGPL-3.0. Any product built on top of those versions will be required to be open source under the same licence.
-
