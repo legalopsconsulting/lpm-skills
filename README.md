@@ -14,20 +14,20 @@ These aren't report templates or document checklists. They encode the judgment c
 
 | # | Skill | Purpose |
 |---|-------|---------|
-| 1 | [status-report-drafter](status-report-drafter/) | Transforms emails, call notes, and updates into structured matter status reports with RAG ratings, variance commentary, and escalation flags |
-| 2 | [risk-and-issues-manager](risk-and-issues-manager/) | RAID log methodology with decision extraction from emails and meeting notes. Captures risks, assumptions, issues, and decisions — including the ones buried in email chains that nobody recorded |
-| 3 | [scope-change-controller](scope-change-controller/) | Scope management across the matter lifecycle — baseline capture, in-flight change control, out-of-scope documentation, and scope retrospective at close |
-| 4 | [matter-intake-scoping](matter-intake-scoping/) | Matter scoping across the full pre-execution arc — organise unstructured client data into a structured brief, capture the agreed scope baseline, or reconstruct scope when inheriting a matter mid-flight |
-| 5 | [matter-plan-builder](matter-plan-builder/) | Convert agreed scope into a structured matter plan — phases, workstreams, milestones, dependencies, owner assignments. Five operating modes including plan update from correspondence |
-| 6 | [timeline-generator](timeline-generator/) | Build a dependency network and critical path from a matter plan. Interactive Gantt output. Run what-if cascade scenarios when delays occur — showing programme impact across jurisdictions and drafting client communications |
-| 7 | [budget-and-fee-manager](budget-and-fee-manager/) | Matter budgeting and ongoing WIP/variance monitoring. Phase-based fee estimates, bottom-up budgets, AFA structuring, forecast-to-complete, and write-off analysis |
-| 8 | [billing-cycle-manager](billing-cycle-manager/) | Operational billing execution — bill preparation, LC invoice review and disbursement treatment, client billing query responses, cashflow modelling, and leverage analysis |
-| 9 | [stakeholder-comms-planner](stakeholder-comms-planner/) | Stakeholder mapping, communication plan design, reporting hierarchy, and mid-matter comms updates for multi-jurisdiction programmes |
-| 10 | [resource-planner](resource-planner/) | Team structure design, gearing analysis, continuity planning, and competing demand management across matters |
-| 11 | [local-counsel-manager](local-counsel-manager/) | End-to-end external local counsel lifecycle — selection, instruction design, performance monitoring, scope enforcement, and relationship escalation |
-| 12 | [continuous-improvement-engine](continuous-improvement-engine/) | Capture, structure, and recycle lessons from active and closed matters. In-flight capture, mid-matter review, matter close retrospective, and automated weekly insight detection with skill update proposals |
-| 13 | [collaboration-platform-advisor](collaboration-platform-advisor/) | Collaboration platform configuration methodology — SharePoint, Teams, matter site architecture, dashboards, workflow automation briefs, data quality, and adoption |
-| 14 | [document-approval-tracker](document-approval-tracker/) | Approval cascade design and tracking for multi-stakeholder document workflows — review sequences, position tracking, overdue chasing, version control, and iManage/SharePoint migration workflow |
+| 1 | [status-report-drafter](skills/status-report-drafter/) | Transforms emails, call notes, and updates into structured matter status reports with RAG ratings, variance commentary, and escalation flags |
+| 2 | [risk-and-issues-manager](skills/risk-and-issues-manager/) | RAID log methodology with decision extraction from emails and meeting notes. Captures risks, assumptions, issues, and decisions — including the ones buried in email chains that nobody recorded |
+| 3 | [scope-change-controller](skills/scope-change-controller/) | Scope management across the matter lifecycle — baseline capture, in-flight change control, out-of-scope documentation, and scope retrospective at close |
+| 4 | [matter-intake-scoping](skills/matter-intake-scoping/) | Matter scoping across the full pre-execution arc — organise unstructured client data into a structured brief, capture the agreed scope baseline, or reconstruct scope when inheriting a matter mid-flight |
+| 5 | [matter-plan-builder](skills/matter-plan-builder/) | Convert agreed scope into a structured matter plan — phases, workstreams, milestones, dependencies, owner assignments. Five operating modes including plan update from correspondence |
+| 6 | [timeline-generator](skills/timeline-generator/) | Build a dependency network and critical path from a matter plan. Interactive Gantt output. Run what-if cascade scenarios when delays occur — showing programme impact across jurisdictions and drafting client communications |
+| 7 | [budget-and-fee-manager](skills/budget-and-fee-manager/) | Matter budgeting and ongoing WIP/variance monitoring. Phase-based fee estimates, bottom-up budgets, AFA structuring, forecast-to-complete, and write-off analysis |
+| 8 | [billing-cycle-manager](skills/billing-cycle-manager/) | Operational billing execution — bill preparation, LC invoice review and disbursement treatment, client billing query responses, cashflow modelling, and leverage analysis |
+| 9 | [stakeholder-comms-planner](skills/stakeholder-comms-planner/) | Stakeholder mapping, communication plan design, reporting hierarchy, and mid-matter comms updates for multi-jurisdiction programmes |
+| 10 | [resource-planner](skills/resource-planner/) | Team structure design, gearing analysis, continuity planning, and competing demand management across matters |
+| 11 | [local-counsel-manager](skills/local-counsel-manager/) | End-to-end external local counsel lifecycle — selection, instruction design, performance monitoring, scope enforcement, and relationship escalation |
+| 12 | [continuous-improvement-engine](skills/continuous-improvement-engine/) | Capture, structure, and recycle lessons from active and closed matters. In-flight capture, mid-matter review, matter close retrospective, and automated weekly insight detection with skill update proposals |
+| 13 | [collaboration-platform-advisor](skills/collaboration-platform-advisor/) | Collaboration platform configuration methodology — SharePoint, Teams, matter site architecture, dashboards, workflow automation briefs, data quality, and adoption |
+| 14 | [document-approval-tracker](skills/document-approval-tracker/) | Approval cascade design and tracking for multi-stakeholder document workflows — review sequences, position tracking, overdue chasing, version control, and iManage/SharePoint migration workflow |
 
 ## How to install
 
