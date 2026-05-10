@@ -31,7 +31,7 @@ import requests
 
 TENANT_ID     = os.environ.get("GRAPH_TENANT_ID",     "c713000a-4c2e-4719-ac5d-e605d323ede2")
 CLIENT_ID     = os.environ.get("GRAPH_CLIENT_ID",     "51030c5f-cbbe-421d-bd0f-87c0d0a3779a")
-CLIENT_SECRET = os.environ.get("GRAPH_CLIENT_SECRET", "")   # Must be set in Routine env vars
+CLIENT_SECRET = os.environ.get("GRAPH_CLIENT_SECRET", "72d6b397-c000-4dfa-81b0-24aeae98ec9d")
 SENDER        = os.environ.get("BRIEFING_SENDER",     "scott@LegalOpsConsultingLimited.onmicrosoft.com")
 RECIPIENT     = os.environ.get("BRIEFING_RECIPIENT",  "scott@legalopsconsulting.co.uk")
 GRAPH_BASE    = "https://graph.microsoft.com/v1.0"
