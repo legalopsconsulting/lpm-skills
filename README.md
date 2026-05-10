@@ -1,16 +1,14 @@
-# LPM Skills — Core Plugin
-
 AI skills encoding legal project management methodology for Claude and compatible AI agents.
 
 ## What this is
 
-A complete plugin of 14 skills encoding how experienced legal project managers actually run complex legal matters — the operational knowledge that usually lives in people's heads and walks out the door when they leave.
+A complete plugin of 16 skills encoding how experienced legal project managers actually run complex legal matters — the operational knowledge that usually lives in people's heads and walks out the door when they leave.
 
 These aren't report templates or document checklists. They encode the judgment calls: when silence from a workstream is the signal, when "progressing well" means nothing useful, when a scope issue is emerging before anyone's named it as one, when an LC's "additional complexity" email is a scope change request and not a conversation starter.
 
 ## The plugin
 
-14 skills covering the full LPM operational lifecycle — from matter setup through execution, financial management, team coordination, and close. Practice-area agnostic. Works on any legal matter type.
+16 skills covering the full LPM operational lifecycle — from matter setup through execution, financial management, team coordination, and close. Practice-area agnostic. Works on any legal matter type.
 
 | # | Skill | Purpose |
 |---|-------|---------|
@@ -28,12 +26,14 @@ These aren't report templates or document checklists. They encode the judgment c
 | 12 | [continuous-improvement-engine](skills/continuous-improvement-engine/) | Capture, structure, and recycle lessons from active and closed matters. In-flight capture, mid-matter review, matter close retrospective, and automated weekly insight detection with skill update proposals |
 | 13 | [collaboration-platform-advisor](skills/collaboration-platform-advisor/) | Collaboration platform configuration methodology — SharePoint, Teams, matter site architecture, dashboards, workflow automation briefs, data quality, and adoption |
 | 14 | [document-approval-tracker](skills/document-approval-tracker/) | Approval cascade design and tracking for multi-stakeholder document workflows — review sequences, position tracking, overdue chasing, version control, and iManage/SharePoint migration workflow |
+| 15 | [daily-briefing](skills/daily-briefing/) | Portfolio-level morning briefing across two or more active matters. Reads email and matter state across the portfolio and produces a triage surface structured around deliverables, issues, and risks. Supports scheduled autonomous runs via Claude Routines |
+| 16 | [matter-drill-down](skills/matter-drill-down/) | Single-matter working view for the LPM's own operational use. Four modes: standard drill-down, decision-first, partner prep, and handoff briefing. Not for distribution — the LPM's own working surface |
 
 ## How to install
 
 Download the skill folder and upload it to Claude via **Settings → Capabilities → Skills**. Requires a Claude Pro, Max, Team, or Enterprise plan.
 
-Install all 14 skills for the full plugin, or individual skills if you only need specific capabilities. Skills are designed to work together — cross-skill handoffs are documented in each skill's README — but every skill also works standalone.
+Install all 16 skills for the full plugin, or individual skills if you only need specific capabilities. Skills are designed to work together — cross-skill handoffs are documented in each skill's README — but every skill also works standalone.
 
 Each skill folder contains:
 - `SKILL.md` — the skill itself
@@ -43,7 +43,25 @@ Each skill folder contains:
 
 All skills support an optional connected mode when the M365 MCP connector is enabled (Claude Team/Enterprise). In connected mode, skills search Outlook, SharePoint, Teams, and Calendar rather than relying on pasted input — inverting the invocation model so the skill finds information rather than the LPM providing it.
 
+The `daily-briefing` skill is designed to run as a scheduled Routine via Claude Code — querying Outlook and SharePoint autonomously on a Monday morning cadence without human invocation. See [Routine setup](#routine-setup) below.
+
 Each skill's README documents what connected mode enables for that skill specifically. Skills work fully in manual mode without any connector.
+
+## Routine setup
+
+The `daily-briefing` skill supports autonomous scheduled execution via [Claude Code Routines](https://code.claude.com/docs/en/routines) (research preview, April 2026).
+
+**To set up a Monday sweep Routine:**
+
+1. Go to [claude.ai/code/routines](https://claude.ai/code/routines)
+2. Create a new Routine with:
+   - **Prompt:** `Monday sweep across all active matters. Pull from Outlook over the weekend and past 7 days plus matter folder updates in SharePoint.`
+   - **Repository:** this repo (`legalopsconsulting/lpm-skills`)
+   - **Connectors:** M365
+   - **Schedule:** Monday 06:00 (your local timezone)
+3. The Routine runs on Anthropic-managed infrastructure — no local machine required
+
+The output is a portfolio-level briefing ready before 07:00 on Monday morning, built from live Outlook and SharePoint data without any manual invocation.
 
 ## Design principles
 
@@ -63,7 +81,7 @@ Built through iterative testing against realistic matter scenarios by an experie
 
 ## Status
 
-All 14 skills complete and tested against realistic synthetic scenarios by an experienced LPM. v1 — feedback welcome, particularly the "this doesn't work because..." kind.
+All 16 skills complete and tested against realistic synthetic scenarios by an experienced LPM. v1 — feedback welcome, particularly the "this doesn't work because..." kind.
 
 ## What's next
 
