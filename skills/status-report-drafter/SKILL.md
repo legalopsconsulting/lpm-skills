@@ -1,6 +1,6 @@
 ---
 name: status-report-drafter
-version: 2.1.9
+version: 2.2.0
 description: Draft matter status reports from emails, call notes, and updates. Internal and client-facing formats, RAG logic, variance commentary, escalation flags. Use when asked to draft a status report, write a project update, summarise matter progress, prepare a client report, create a weekly or monthly update, convert emails into a status summary, or produce any kind of matter reporting. Also triggers when the user pastes email threads and asks what the status is, or needs to turn internal updates into client-facing reports. Also use when the user says things like "pull something together for the partner call", "I need to update the client on where we are", or "can you summarise what's happened this week".
 ---
 
@@ -195,6 +195,63 @@ When the M365 MCP connector is enabled, this skill can:
 - Search Teams channels for matter-specific updates — supplement to SharePoint, not a substitute
 
 Without the connector, provide the same information by pasting email text, call notes, or describing the situation. The skill works identically in both modes.
+
+## Memory Store (matter-specific calibration)
+
+Some matters accumulate calibration that should persist across reporting periods: partner phrasing preferences, accepted variance methodology, escalation thresholds, client communication preferences, and prior decisions. Rather than re-establishing this context in every prompt, the skill reads from a matter-scoped Memory Store document at the start of each run and proposes updates at the end.
+
+### Read — before drafting
+
+When the M365 connector is active and a matter name is known, search SharePoint for a file named `[MatterName]_LPM_Memory.md` in the matter folder as part of Step 1, before beginning Step 2 (Extract substantive updates).
+
+**Search query:** Use the matter name keyword only (e.g. `Meridian_LPM_Memory`). If the file is found, read it in full and apply its contents silently — do not summarise the memory document to the user or describe what you found. The calibration should appear in the output as if it were always known.
+
+**Calibration precedence:** Memory Store entries override skill defaults where they conflict:
+
+- **Variance commentary** — Apply the accepted methodology and phrasing from the Memory Store. Do not default to calendar pro-rata if a sequencing-adjusted baseline is recorded.
+- **RAG assessment** — Apply escalation thresholds from the Memory Store. A workstream that meets the skill's default Green criteria may be Amber or Red based on matter-specific thresholds.
+- **Client-facing framing** — Apply communication preferences from the Memory Store. Default tone assumptions do not override recorded client preferences.
+- **Partner preferences** — Apply phrasing standards from the Memory Store. Generic phrasing that would normally pass quality review may be flagged if the Memory Store records a specific standard (e.g. "progressing well" is insufficient if the Memory Store records that the supervising partner requires a specific progress indicator).
+
+If no Memory Store file is found, proceed without one. Do not flag its absence to the user unless they ask.
+
+### Write — after drafting
+
+At the end of every run, append a **Proposed Memory Update** block to the output document. Include it whether or not a Memory Store was read, and whether or not new calibration emerged — the LPM needs to see the loop is active.
+
+```
+## Proposed Memory Update — [Matter Name], [Date]
+
+The following calibration points emerged from this reporting period.
+Review and promote to the Memory Store if confirmed.
+
+**Partner preferences:**
+- [New preference identified, if any]
+
+**Variance commentary:**
+- [New methodology or phrasing accepted this period, if any]
+
+**Escalation thresholds:**
+- [New threshold identified or triggered, if any]
+
+**Client communication preferences:**
+- [New preference identified, if any]
+
+**Prior decisions:**
+| Date | Decision | Rationale | Owner |
+|---|---|---|---|
+| [Date] | [Decision] | [Rationale] | [Owner] |
+
+No new calibration points this period.
+```
+
+Use the "No new calibration points" line when nothing emerged. Do not omit the block.
+
+**The skill does not write to SharePoint.** The proposed update block is a section of the output document. The LPM reviews it, confirms what to keep, and commits confirmed entries to the SharePoint file — either manually or via Claude Code. Nothing enters the Memory Store without LPM review.
+
+### Without the M365 connector
+
+If the connector is not active, the Memory Store cannot be read automatically. If the user pastes memory store content directly into the prompt, apply it with the same precedence rules and include the Proposed Memory Update block in the output as normal.
 
 ## Time-sensitive assumptions
 
