@@ -1,18 +1,18 @@
 ---
 name: daily-briefing
-description: Produces a portfolio-level morning briefing for an LPM running two or more active matters. Reads email, call notes and matter state across the portfolio and produces a triage surface structured around deliverables (what is due, when, to whom), issues (current problems requiring action), and risks (plausible future problems requiring monitoring). Use when the user asks "run my daily briefing", "portfolio briefing", "what do I need to know today", "what's landed overnight", "Monday sweep", "pre-09:00 briefing", "weekend catchup", or pastes correspondence spanning two or more matters. Not for single-matter briefings (use matter-drill-down) or for audience-facing status reports (use status-report-drafter). Produces a .docx working surface for the LPM's own consumption, not distribution.
+description: Produces a portfolio-level morning briefing for an LPM running two or more active matters. Reads email, call notes and matter state across the portfolio and produces a triage surface structured around meetings (today and this week), deliverables (what is due, when, to whom), issues (current problems requiring action), and risks (plausible future problems requiring monitoring). Also reads Outlook Calendar to surface upcoming matter-relevant meetings and to flag past meetings where no follow-up correspondence has been identified. Use when the user asks "run my daily briefing", "portfolio briefing", "what do I need to know today", "what's landed overnight", "Monday sweep", "pre-09:00 briefing", "weekend catchup", or pastes correspondence spanning two or more matters. Not for single-matter briefings (use matter-drill-down) or for audience-facing status reports (use status-report-drafter). Produces a .docx working surface for the LPM's own consumption, not distribution.
 license: Apache-2.0
 metadata:
   author: LegalOps Consulting
-  version: 1.0.0
+  version: 1.1.0
   plugin: LPM Core
 ---
 
 # daily-briefing
 
-Portfolio-level triage surface for an LPM running two or more active matters. The skill reads correspondence and matter state across the portfolio and produces a morning briefing structured around three primary elements: deliverables, issues, and risks. Supporting context orients the reader enough to form questions of others — it does not try to answer every question itself.
+Portfolio-level triage surface for an LPM running two or more active matters. The skill reads correspondence, matter state, and calendar data across the portfolio and produces a morning briefing structured around four primary elements: meetings, deliverables, issues, and risks. Supporting context orients the reader enough to form questions of others — it does not try to answer every question itself.
 
-The discipline the skill encodes is cross-matter ranking. An LPM running a portfolio does not read their matters sequentially. They rank across the book — external deadlines today beat internal deadlines this week; a Green matter with a client-facing commitment today beats a Red matter in steady state. This skill makes that ranking discipline explicit and reproducible.
+The discipline the skill encodes is cross-matter ranking. An LPM running a portfolio does not read their matters sequentially. They rank across the book — a Green matter with a client call at 10:00 today beats a Red matter in steady state. This skill makes that ranking discipline explicit and reproducible.
 
 ## When to use this skill
 
@@ -43,6 +43,7 @@ Classify the input before selecting a mode. The cost of misclassification (runni
 - For each silent matter (on roster, no correspondence): note the matter as silent at this step.
 - Do not treat roster entries as substantive input. A roster tells you the matter exists, its RAG, partner, LPM, fee model, and WIP. It does not tell you what is happening on the matter this week.
 - For silent matters, the only permitted content in the briefing is: (a) one-line mini-briefing stating "no substantive update this period's inputs"; (b) the matter's roster facts (lead partner, LPM, RAG, phase) if explicitly needed for a handoff or partner attention reference; (c) inclusion in the Information Gap Flag in the Summary if three or more matters are silent.
+- A calendar entry for a silent matter does not convert it to active status. Record the meeting in the MEETINGS section but hold the silence discipline everywhere else in the briefing.
 - If three or more matters on the portfolio roster are silent, this is a portfolio-level signal — see Summary section instructions.
 
 ## Before Starting Any Mode
@@ -81,7 +82,7 @@ Do not produce a "matter-level briefing structured to the template where possibl
 
 **Fires when:** User requests a briefing across the portfolio with no specific timeframe, or when inputs span multiple matters without timeframe context.
 
-**Input:** Correspondence, call notes, and matter baseline across the portfolio.
+**Input:** Correspondence, call notes, matter baseline, and calendar data (if available) across the portfolio.
 
 **Output:** Portfolio briefing using the standard template (below).
 
@@ -97,11 +98,10 @@ Do not produce a "matter-level briefing structured to the template where possibl
 
 **Fires when:** User asks for "Monday sweep", "weekend catchup", "what landed over the weekend", or the monday-sweep scheduled Routine invokes the skill.
 
-**Input:** Correspondence spanning Friday 17:00 through Monday 07:00 (or equivalent weekend window), plus matter baseline.
+**Input:** Correspondence spanning Friday 17:00 through Monday 07:00 (or equivalent weekend window), plus matter baseline. Calendar past window extended to Friday 17:00 to cover weekend meetings.
 
-**Output:** Standard briefing template (below) with two additions:
+**Output:** Standard briefing template (below) with one addition:
 - **Weekend developments** section (items that landed between Friday close and Monday open)
-- **Week-ahead calendar overlay** (matter-critical dates for the week ahead, drawn from provided data or inferred from correspondence)
 
 ### Mode 4 — Ad-hoc timeframe
 
@@ -109,7 +109,7 @@ Do not produce a "matter-level briefing structured to the template where possibl
 
 **Input:** Correspondence bounded to the specified window.
 
-**Output:** Standard briefing template scoped to the timeframe. Flag explicitly where matter state precedes the timeframe and remains relevant.
+**Output:** Standard briefing template scoped to the timeframe. Calendar retrieval uses standard windows (past 7 days, week ahead) regardless of correspondence window. Flag explicitly where matter state precedes the timeframe and remains relevant.
 
 ## Standard Template (Modes 1, 3, and 4)
 
@@ -127,6 +127,9 @@ SUMMARY
 [3–5 lines. Cross-matter framing, not sequential matter summaries.
 Name the portfolio-level signal in one sentence. Identify the one or
 two items that shape the day. State what needs attention before 09:00.
+Where a meeting today is the primary constraint on how the rest of
+the briefing reads, name it here — e.g. "Client call on Meridian
+at 10:00 is today's primary constraint."
 
 Information Gap Flag when applicable: if three or more matters on
 the portfolio roster are silent in the input, name this explicitly
@@ -142,6 +145,27 @@ not to fabricate content to fill the gap.]
 WEEKEND DEVELOPMENTS
 - [Item with matter, source, and one-line summary]
 - [...]
+
+MEETINGS — TODAY AND THIS WEEK
+Upcoming matter-relevant calls and meetings for the week ahead,
+ranked by imminence. Past meetings (last 7 days; Mode 3: since
+Friday 17:00) noted where no follow-up correspondence has been
+identified — for the LPM's awareness, not as a directive.
+
+Upcoming:
+| # | When | Matter | Meeting | Attendees | Notes |
+|---|---|---|---|---|---|
+| 1 | [Day, time] | [...] | [...] | [...] | [...] |
+
+Past — no follow-up identified (soft flag only):
+| Matter | Meeting | Date | Note |
+|---|---|---|---|
+
+If no calendar data is available: state "Calendar not retrieved
+this session — paste calendar entries or connect M365 Calendar
+to populate." Do not invent meetings. Do not infer meetings
+from correspondence references. If calendar is empty or
+unavailable, this section states so and stops.
 
 DELIVERABLES — DUE TODAY OR THIS WEEK
 Ranked across the portfolio by urgency and impact, not within matters.
@@ -200,13 +224,6 @@ content elsewhere in the briefing. Read times included.
 | # | Source | Matter | Why this first | Read time |
 |---|---|---|---|---|
 
-[Mode 3 only:]
-WEEK-AHEAD CALENDAR OVERLAY
-Matter-critical dates and scheduling pressure points for the week.
-If no calendar data provided, state "Calendar overlay not available
-— briefing prepared without scheduling context" and list any
-scheduling collisions inferable from correspondence.
-
 HANDOFFS FLAGGED
 Single-matter skills to invoke as follow-through. Each row names
 the matter and the specific trigger.
@@ -225,9 +242,29 @@ End of briefing.
 
 ### Cross-matter ranking discipline
 
-Portfolio briefings are not matter reports stacked end to end. An LPM does not read matter by matter — they rank across the book. A Green matter with an external deadline today genuinely beats a Red matter in steady state. RAG is a trailing indicator of matter health; daily urgency is a leading indicator of today's action requirement. The two are different axes.
+Portfolio briefings are not matter reports stacked end to end. An LPM does not read matter by matter — they rank across the book. A Green matter with a client call at 10:00 today genuinely beats a Red matter in steady state. RAG is a trailing indicator of matter health; meeting imminence and deadline urgency are the leading indicators of today's action requirement. The two are different axes.
 
 **In the Deliverables section, rank across matters. Do not group by matter.**
+
+### Calendar and meetings
+
+**Meeting imminence as a ranking signal.** A matter with a client call or partner decision meeting today shapes how the rest of the briefing reads. Name the meeting in the SUMMARY when it is the day's primary constraint. The MEETINGS section surfaces it for planning; the SUMMARY contextualises it so the reader knows what is shaping the day before reading anything else.
+
+**Past meeting gap detection — judgment, not compliance.** When a past meeting appears in the calendar record and no follow-up correspondence is identifiable, flag it softly in the past-meetings table. The question is not "was there a follow-up?" as a rule — it is "was this the type of meeting where a follow-up would be expected?" Apply this distinction:
+
+- Client calls with substantive agenda → soft flag if no follow-up email, action note, or instruction identified
+- Partner decision meetings → soft flag if no decision record or follow-on instruction identified
+- LC calls → soft flag if no instruction email or written confirmation follows
+- Internal team check-ins → judgment call; routine standups do not require follow-up; a review meeting where decisions were expected does
+- Admin or scheduling calls → no flag expected
+
+The flag is for the LPM's awareness only. Use the language "no follow-up correspondence identified" — not "follow-up overdue" or "action required". The LPM decides whether to chase. Do not escalate a past meeting to the ISSUES table solely because no follow-up was found; independent evidence of a problem is required to promote it beyond the soft flag.
+
+**Calendar matching to matters.** Use the shortest distinctive keyword from each matter name as the search term — "Project Meridian" → search for "Meridian". Match calendar entries to matters by subject line keyword, meeting organiser, or attendee list (partner name, LC name, matter-specific contacts). Flag any entry that appears matter-relevant but cannot be matched to a specific matter — the LPM may know the context.
+
+**A calendar entry for a silent matter.** Record the meeting in the MEETINGS upcoming table. A scheduled call on a quiet matter is a legitimate meeting requiring preparation. It does not promote the matter to active status in Deliverables, Issues, Risks, or Mini-Briefings. The silence discipline holds everywhere except the MEETINGS section.
+
+**Do not invent meetings.** If calendar data is absent or connected retrieval returns nothing, state so and leave the section empty. Do not infer meetings from correspondence (an email referencing "our call on Tuesday" does not populate the MEETINGS table — only confirmed calendar entries do).
 
 ### Restraint on steady-state matters
 
@@ -243,6 +280,8 @@ If an input is silent on a matter in the portfolio roster, report that matter as
 - **Risks** are plausible future problems requiring monitoring. Counterparty silent for N days. Regulatory regime under review. LC capacity signals thin. These need watch status and mitigation room.
 
 **Silence on its own is a risk, not an issue.** LC has not responded for 8 days — risk (ratcheting toward issue). LC has formally rejected the instruction — issue. Do not promote risks to issues without confirmation.
+
+Past meetings with no identified follow-up sit in the MEETINGS past-meetings table as soft flags. They are not risks and not issues unless independent evidence of a problem exists beyond the absence of a follow-up email.
 
 ### Cross-matter patterns
 
@@ -312,18 +351,24 @@ Each handoff row in the output includes matter, trigger, and priority.
 
 ## M365 Connected Mode
 
-**Mode 1 (Portfolio briefing).** Connected mode enables the skill to query Outlook for matter folders identified in the roster, retrieve correspondence in the specified timeframe, and produce the briefing without user paste.
+**Calendar retrieval (all modes).** When the M365 Calendar connector is available, query `outlook_calendar_search` for each matter in the roster using the shortest distinctive matter name keyword. Run two windows per matter:
+- **Future:** today through end of current week
+- **Past:** last 7 days (Mode 3 Monday sweep: Friday 17:00 through Monday morning)
 
-**Mode 3 (Monday sweep).** Connected mode enables scheduled invocation via the monday-sweep Routine. Default retrieval window: Friday 17:00 → Monday 06:00. The Routine queries all matter folders identified in the user's portfolio roster (persisted as Project Memory or stored artefact).
+Cross-reference past calendar entries against retrieved email correspondence to identify meetings with no follow-up. Surface results in the MEETINGS section. Do not query calendar before checking whether the connector is available — if unavailable, state so in the MEETINGS section and proceed.
 
-**Mode 4 (Ad-hoc timeframe).** Connected mode retrieves correspondence within the user-specified window.
+**Mode 1 (Portfolio briefing).** Connected mode enables the skill to query Outlook for matter folders identified in the roster, retrieve correspondence in the specified timeframe, query Calendar for the week ahead and the past 7 days, and produce the briefing without user paste.
 
-**Manual mode fallback.** All four modes operate fully on pasted input. Connected mode is an efficiency enhancement, not a prerequisite.
+**Mode 3 (Monday sweep).** Connected mode enables scheduled invocation via the monday-sweep Routine. Default correspondence window: Friday 17:00 → Monday 06:00. Calendar past window extends to Friday 17:00 to cover weekend meetings. The Routine queries all matter folders identified in the user's portfolio roster (persisted as Project Memory or stored artefact).
 
-**Future connectors.** A future DMS or practice management system connector would enable the skill to retrieve matter baselines (phase, fee model, WIP) from the system of record rather than from user-pasted roster. This is Phase 3 work.
+**Mode 4 (Ad-hoc timeframe).** Connected mode retrieves correspondence within the user-specified window. Calendar retrieval uses the standard windows (past 7 days, week ahead) regardless of the correspondence window.
+
+**Manual mode fallback.** All four modes operate fully on pasted input. Calendar entries can be pasted directly alongside email and call notes; if so, process them using the same matching logic as connected mode. If no calendar data is provided and connected retrieval is unavailable, state "Calendar not retrieved this session" in the MEETINGS section and proceed with email and correspondence inputs only.
+
+**Future connectors.** A DMS or practice management system connector would enable matter baseline retrieval (phase, fee model, WIP) from the system of record rather than from user-pasted roster. Deferred.
 
 ## Time-Sensitive Assumptions
 
 - Portfolio roster format assumes matter identifiers from Intapp Open or equivalent practice management system. Firms using different systems will require a roster format adjustment.
-- Connected mode patterns assume M365/Outlook as the email environment. Firms on Google Workspace or other platforms will require connector-specific adjustment.
+- Connected mode patterns assume M365/Outlook as the email and calendar environment. Firms on Google Workspace or other platforms will require connector-specific adjustment.
 - The "monday-sweep" Routine schedule (Mondays 06:00 local) is Europe/London default. User-customisable.
