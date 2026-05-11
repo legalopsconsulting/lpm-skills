@@ -1,459 +1,425 @@
+# Build Log: matter-drill-down
+
+**Skill:** matter-drill-down (LPM Core plugin extension — portfolio layer, single-matter zoom-in)
+**Plugin:** LPM Core
+**Built:** 19 April 2026
+**Phase 3 pass:** 11 May 2026
+**Status:** Phase 3 complete (calendar integration — Mode 3 and Mode 4). Phase 2 status: 4 PASS, 1 PARTIAL (TP-2 restraint — minor), 2 V1 LIMITATION (TP-5 Mode 2, TP-6 audience routing), 1 FAIL low-risk (TP-8 identifier gate).
+**Line count:** 470 / 500 limit
+**Description character count:** 867 / 1024 limit (unchanged)
+**Version:** 1.1.0
+
 ---
-name: matter-drill-down
-description: Produces an LPM working view on a single matter — a focused zoom-in for the LPM's own operational use, not for distribution. Structured around deliverables (what is due, when, to whom), issues (current problems requiring action), and risks (plausible future problems requiring monitoring). Use when the user asks "drill into [matter]", "brief me on [matter]", "focus on [matter]", "zoom into [matter]", "prep me for [partner] call on [matter]", "I'm handing [matter] to [name]", "leave cover on [matter]", "taking over [matter]", or pastes single-matter correspondence asking for a working view. Four modes: standard drill-down, decision-first, partner prep, handoff briefing. Not for status reports for distribution (use status-report-drafter) or portfolio views across multiple matters (use daily-briefing). Produces a .docx working view saved to the matter folder.
-license: Apache-2.0
-metadata:
-  author: LegalOps Consulting
-  version: 1.0.0
-  plugin: LPM Core
+
+## Build Timeline
+
+1. Read reference materials: `skill-build-process-template-v1.md`, `matter-intake-scoping-build-log.md` (canonical pattern), status-report-drafter boundary language via `lpm-plugin-planning-v1_7.md`, daily-briefing SKILL.md (adjacent skill — this skill is invoked from daily-briefing Mode 2 routing).
+2. Confirmed user's calibration on Mode 4 (handoff briefing): handoff situations happen constantly — leave cover, role transitions, matter reallocation, onboarding — and the process is universally painful to do and frequently skipped despite clear operational value. Mode 4 is therefore load-bearing for v1, not a nice-to-have.
+3. Confirmed user's calibration on output shape for Mode 4 specifically: deliverables with dates and owners + existing and potential future issues with enough context for the receiving LPM to mitigate and to ask questions of others. Supporting orientation context is subordinate.
+4. Generalised the deliverables/issues/risks spine to all four modes — this is the structural commitment for the skill, not a Mode 4 specific pattern.
+5. Confirmed LPM-grade-generic framing — handoffs happen at every grade, not only senior.
+6. Confirmed four modes: standard drill-down (Mode 1), decision-first (Mode 2), partner prep (Mode 3), handoff briefing (Mode 4). All four retain the deliverables/issues/risks spine with different emphasis per mode.
+7. Applied design principles: DP-26 input classification (single-matter vs multi-matter vs audience check), DP-27 template skeletons as populated templates, produce-don't-ask, Summary label, identifier gate (harder than daily-briefing — matter identifiers required before production).
+8. Encoded Mode 4 domain knowledge specifically: the section "what is not visible in the matter files" is the high-value tacit knowledge transfer. Prompted explicitly — this is the one section where placeholders are not acceptable; the skill asks the outgoing LPM for this content.
+9. Encoded the five named sections that structure Mode 4: Deliverables (operational spine), Issues (in-flight problems), Risks (future problems), Outstanding Commitments (things promised but not done), What Is Not Visible (tacit knowledge), Who To Call (named contacts by issue type).
+10. Encoded Mode 3 template variation for partner prep: Decisions Required, Information the Partner May Not Have, Likely Questions with Prepared Answers.
+11. Encoded Mode 2 template variation for decision-first: collapsed deliverables/team/finance/cross-matter, expanded open decisions with options and blockers.
+12. Wrote SKILL.md: 444 lines, 867-character description.
+13. **(Phase 3 — 11 May 2026)** Calendar integration identified as Phase 3 backlog item for this skill (item 5: "Connected mode testing"; item in Future Connectors: "Calendar connector would improve Mode 3 quality"). Scope confirmed following daily-briefing Phase 3 pass: targeted edit, not rebuild. 460 actual lines (build log recorded 444 — patches added post-log), 40 lines of headroom. Sufficient for surgical additions to Mode 3 and Mode 4.
+14. **(Phase 3)** Design confirmed: no design decisions required from user — scope is clear and constrained. Mode 3 is the primary use case (last partner touchpoint + upcoming call confirmation). Mode 4 has an existing SCHEDULED TOUCHPOINTS section that calendar populates. Mode 1 and Mode 2 out of scope for this pass.
+15. **(Phase 3)** Key design insight identified during SKILL.md review: the last touchpoint date is not just context for Mode 3 — it anchors the INFORMATION THE PARTNER MAY NOT HAVE section. Anything arriving since the last partner call is potentially news to the partner. This makes the calendar data operationally load-bearing in Mode 3, not decorative. Applied explicitly in both the template and the Connected Mode description.
+16. **(Phase 3)** Three targeted edits applied (v1.1.0): RECENT PARTNER TOUCHPOINTS section added to Mode 3 template; INFORMATION THE PARTNER MAY NOT HAVE anchored to last touchpoint; M365 Connected Mode Mode 3 and Mode 4 updated; Future Connectors calendar reference removed.
+17. **(Phase 3)** TP-4 connected mode tested — PASS. Matter folder hygiene gap caught by connected mode retrieval; SCHEDULED TOUCHPOINTS populated from live calendar data.
+18. **(Phase 3)** TP-3 connected mode tested — FAIL (iteration 1), FAIL (iteration 2), PASS (iteration 3). Two independent failure modes resolved: mandatory retrieval gate added to Before Starting Any Mode; header-first forcing function added to Mode 3 Output definition. SKILL.md v1.2.0 produced at 474 lines. Build log updated.
+
 ---
 
-# matter-drill-down
+## Skill Scope Decisions
 
-Working view on a single matter for the LPM's own operational use. Structured around three primary elements: deliverables, issues, and risks. Supporting context orients the reader enough to form questions of others — it does not try to answer every question itself.
+### Four modes, all retaining deliverables/issues/risks spine
 
-The skill is different from `status-report-drafter` in that the output is for the LPM, not for a partner or client audience. Different register, different structural choices, different expectation of distribution. The drill-down is a working surface; the status report is a communications artefact.
+Each mode emphasises different parts of the spine but all four retain it. Mode 1 standard: full spine plus supporting orientation. Mode 2 decision-first: spine retained (issues and risks constrain decisions); deliverables collapsed because they are context, not the focus. Mode 3 partner prep: spine retained; additional sections (decisions required, information the partner may not have, likely questions) layered on top. Mode 4 handoff: spine is literally the first three sections of the output; additional sections (outstanding commitments, what is not visible, who to call) complete the handoff.
 
-The skill operates in four modes. Standard drill-down (Mode 1) is the default — the LPM has decided to focus on one matter and wants the full working picture. Decision-first (Mode 2) narrows the view to open decisions only. Partner prep (Mode 3) reshapes the template for an upcoming partner call on the matter. Handoff briefing (Mode 4) produces the briefing a receiving LPM needs to take over a matter without losing continuity — a constantly-triggered need that is currently painful to do and frequently skipped despite its operational value.
+### Mode 4 as primary operational capability, not sleeper mode
 
-## When to use this skill
+Based on user confirmation that handoff situations happen constantly, Mode 4 is built to full operational usefulness rather than as a Phase 3 candidate. Template variation is the longest of the four modes (4–6 pages acceptable), and the domain knowledge section specifically prompts for tacit knowledge transfer. The "what is not visible in the matter files" section is the differentiating capability — the thing this skill does that no other skill in the library produces.
 
-- The user pastes single-matter correspondence and asks for a working view
-- The user asks for a zoom-in from a portfolio briefing — "drill into [matter]", "focus on [matter]"
-- The user is preparing for a partner call on a matter
-- The user is going on leave, handing a matter over, or onboarding someone new to a matter
+### Working view vs status report — the boundary
 
-For portfolio-level views across multiple matters, use `daily-briefing`. For audience-facing status reports, use `status-report-drafter`.
+matter-drill-down produces a working view for the LPM's own consumption. status-report-drafter produces a status report for partner/client distribution. Different tone, different register, different structural choices, different expectation of distribution. The boundary is reinforced at Input Classification Step 3 (audience check — if user specifies partner/client audience, route to status-report-drafter) and in the Boundary section of the SKILL.md.
 
-## Input Classification (apply before mode selection)
+### Open decisions vs live items — distinct sections
 
-**Step 1 — Matter count.** Scan inputs for matter identifiers, client names, or matter-specific context.
-- If inputs are about a single matter → this skill applies. Proceed to Step 2.
-- If inputs span two or more matters → route to `daily-briefing`.
+Canonical LPM discipline. Decisions need someone's attention; live items need tracking. Drill-downs that conflate them produce mush. In Modes 1, 3, 4: Open Decisions is a separate section from Deliverables. In Mode 2: Open Decisions is the spine.
 
-**Step 2 — Mode routing.** Identify the user's invocation pattern:
-- "Handing over", "leave cover", "taking over", "bringing [name] onto", "going on leave" → Mode 4
-- "Prep me for", "partner call", "before the call with" → Mode 3
-- "Decisions only", "what do I need to decide on", "open decisions" → Mode 2. **Mode 2 produces a .docx document using the Mode 2 Template Variation. It does not produce conversational prose or advisory paragraphs. Produce the document, not a chat answer.**
-- Any other single-matter drill-down request → Mode 1 (default)
+### Financial position as headline, not analysis
 
-**Step 3 — Audience check.** If the user specifies the output is for a partner or client audience (e.g. "for JMW to send to the client", "status report for the partner", "client-facing update"), this is the wrong skill. Do not produce any output. Do not produce a status report. Do not produce a client-facing document. Do not read the docx skill. Instead, respond with exactly this pattern and stop:
-
-"This is a [status report / client-facing update] for [audience]. That's status-report-drafter, not a drill-down. Run status-report-drafter on [matter] ([matter number]) with the same inputs."
-
-The failure mode is detecting the audience, deciding you can produce the document anyway, and doing so. That is gate-skipping. The correct behaviour is to refuse and route, even though you could produce the document.
-
-**Step 4 — Input tagging.** If the user has tagged inputs by source (`[FROM LC]`, `[INTERNAL]`, `[CLIENT]`, `[PARTNER]`), preserve the tags in attribution.
-
-## Before Starting Any Mode
-
-**Matter identifiers.** Client name, client number, matter name, matter number. Required in every output header. If not provided in inputs, ask once: *"Confirm matter identifiers (client name, client number, matter name, matter number) before I produce the working view."* Hard gate — do not produce until confirmed or explicit placeholder agreement given.
-
-**Current phase and RAG.** Required. If not in inputs, infer from correspondence and flag the inference.
-
-**Invocation context.** State explicitly why the drill-down is being produced: portfolio briefing handoff, LPMHub click-through, direct ask, upcoming partner call, handoff preparation. Include in output header.
-
-**Receiving LPM (Mode 4 only).** If Mode 4 invocation, identify the receiving LPM. If not provided: *"Who is receiving the matter? (Name required for handoff briefing.)"*
-
-**Call context (Mode 3 only).** If Mode 3 invocation, identify the partner and the call purpose. If not provided: *"Which partner and what is the purpose of the call?"*
-
-## Boundary
-
-This skill produces a **working view on one matter for the LPM's own consumption**. It does not:
-
-- Produce status reports for distribution (use `status-report-drafter`)
-- Produce portfolio-level briefings (use `daily-briefing`)
-- Update RAID logs (use `risk-and-issues-manager`)
-- Draft scope change memos (use `scope-change-controller`)
-- Produce budget variance analysis (use `budget-and-fee-manager`)
-- Produce stakeholder communications plans (use `stakeholder-comms-planner`)
-
-If the user asks for any of these, route to the appropriate skill and do not produce a drill-down.
-
-## Operating Modes
-
-### Mode 1 — Standard drill-down (default)
-
-**Fires when:** User requests a single-matter working view without a more specific invocation pattern.
-
-**Input:** Correspondence, call notes, matter baseline, current-state context for one matter.
-
-**Output:** Working view using the standard template (below). 2–3 pages.
-
-### Mode 2 — Decision-first
-
-**Fires when:** User asks "what do I need to decide on [matter]", "open decisions on [matter]", "[matter] — decisions only".
-
-**Input:** Same as Mode 1.
-
-**Output:** Produce a .docx working view using the Mode 2 Template Variation below. Do not produce conversational prose, advisory paragraphs, or a list of decisions as chat output. The output is a structured document with an identifier header, expanded decision entries in the template format, and retained Issues and Risks tables. Deliverables and supporting orientation sections collapsed to one line each. Do not end with a question or offer.
-
-### Mode 3 — Partner prep
-
-**Fires when:** User is preparing for a partner call on the matter — "prep me for [partner] call", "before the call with [partner]", "pre-call on [matter]".
-
-**Input:** Same as Mode 1, plus context on the upcoming call (partner, purpose, timing).
-
-**Output:** Standard template reshaped for the call:
-- Deliverables and Issues sections expanded around what the partner needs to know or decide
-- Risks section retained but framed as "risks the partner should be aware of"
-- Additional section: **Decisions required from the partner in this call**
-- Additional section: **Information the partner may not yet have**
-- Additional section: **Likely partner questions with prepared answer lines**
-- Mini-briefing, financial position, stakeholder state retained as supporting context
-
-### Mode 4 — Handoff briefing
-
-**Fires when:** User is handing a matter to another LPM — "handover on [matter]", "I'm handing [matter] to [name]", "leave cover on [matter]", "taking over [matter]", "bringing [name] onto [matter]".
-
-**Input:** Same as Mode 1, plus identification of the receiving LPM, plus (where possible) the outgoing LPM's knowledge of the matter that is not in the files.
-
-**Domain knowledge specific to Mode 4:** Handoff briefings are a constantly-triggered operational need. Leave cover, role transitions, and matter reallocations happen continuously. The briefing is universally painful to produce — it takes time the outgoing LPM does not have — and is frequently skipped despite the operational value of doing it well.
-
-The skill's job in Mode 4 is to make the handoff fast enough that it actually happens. The template prioritises the content that matters most to a receiving LPM picking up the matter cold:
-
-1. **Deliverables over the next 2–4 weeks** — what is due, when, to whom. This is the operational spine the receiving LPM needs to not drop anything.
-2. **Issues — current** — what is in flight that needs continued management. Status and context for action.
-3. **Risks — plausible future** — what might come up in the handoff window. Context for mitigation.
-4. **Outstanding commitments the outgoing LPM has made** — the things said in emails, on calls, in meetings that are not yet done but have been promised.
-5. **What is not visible in the matter files** — the tacit knowledge. Relationship dynamics with the client, unwritten context on partner preferences, patterns of behaviour on the other side, things the outgoing LPM knows but has not documented anywhere.
-6. **Who to call** — by issue type. If scope questions arise, call X. If a billing question comes up, call Y. If the client pushes back on something, start with Z.
-
-**Output:** Extended template (below). Longer than Mode 1 — 4–6 pages is acceptable because the handoff briefing is the complete operational transfer document.
-
-## Standard Template (Mode 1)
-
-Produce the template sections in this exact order.
-
-```
-MATTER DRILL-DOWN — [Matter short name]
-
-Client:           [Client name] ([Client No.])
-Matter:           [Matter name] ([Matter No.])
-Lead Partner:     [Initials or name]
-Lead LPM:         [Name]
-Phase:            [Current phase and position]
-RAG:              [Green / Amber / Red]
-Fee model:        [Fixed fee / T&M cap / Phased / etc.]
-WIP / Budget:     [Current WIP] / [Budget]
-Prepared:         [Date and time]
-Invocation:       [Why this drill-down is being produced]
-
-SUMMARY
-[2–3 sentences. Direct, no hedging. Current position. The one or
-two dynamics shaping the week. The next decision point.]
-
-DELIVERABLES — DUE THIS WEEK AND NEXT
-| # | Deliverable | Owner | By when | Status |
-|---|---|---|---|---|
-
-ISSUES — CURRENT
-| Issue | Status | Context for action |
-|---|---|---|
-
-RISKS — PLAUSIBLE FUTURE
-| Risk | Signal | Mitigation context |
-|---|---|---|
-
-OPEN DECISIONS
-| # | Decision | Owner | By when | Current state |
-|---|---|---|---|---|
-
-SCOPE SIGNALS
-Active scope signals on this matter. If none, state "No active
-scope signals" and move on.
-
-| Signal type | Driver | Status | Handoff |
-|---|---|---|---|
-
-FINANCIAL POSITION
-One paragraph. WIP against plan, variance and its nature (structural 
-vs substantive), forward exposures. Do not reproduce full variance 
-analysis here — hand off to `budget-and-fee-manager` for detail.
-
-TEAM AND STAKEHOLDER STATE
-Internal team: [1–3 lines — who is on, current load, staffing watch items]
-Client side: [1–3 lines — who is engaging, current tone, any changes]
-External counsel: [1–3 lines — LC status by jurisdiction, escalations]
-
-CROSS-MATTER CONTEXT
-How this matter connects to others in the portfolio. Shared partner,
-shared LPM, same client, regulatory overlay, counterparty. If no
-notable connections, state "No notable cross-matter context" and
-move on. Do not invent connections.
-
-HANDOFFS
-Single-matter skills to invoke as follow-through.
-
-| Skill | Trigger | Priority |
-|---|---|---|
-
-End of drill-down.
-```
-
-**Output rule:** Produce from available information. Use placeholders for unknowns. Do not withhold pending matter identifiers — ask once, then produce. Do not end with "want me to produce this as a .docx?" — produce the .docx.
-
-**Attribution rule:** Substantive analysis or recommendations from named individuals are attributed by name. Do not generalise to "the team".
-
-## Mode 2 Template Variation (Decision-first)
-
-**Produce the decision-first working view as a .docx using the template below. Do not produce conversational prose, advisory commentary, or a list of decisions in paragraph form. The output is a structured document with an identifier header, expanded decision entries, and retained Issues and Risks tables. Do not end with a question or offer.**
-
-Same header. Collapse Deliverables, Team state, Financial position, Cross-matter context to one line each. Expand:
-
-```
-OPEN DECISIONS — EXPANDED
-
-For each decision:
-- Decision statement
-- Owner and by-when
-- Options under consideration
-- Current state (what is known, what is pending)
-- What is blocking progress
-- LPM recommendation (if applicable)
-
-ISSUES — CURRENT
-[Standard table, retained — issues constrain decisions]
-
-RISKS — PLAUSIBLE FUTURE
-[Standard table, retained — risks inform decisions]
-```
-
-## Mode 3 Template Variation (Partner prep)
-
-Same header with **Partner**, **Call purpose**, **Call timing** added.
-
-```
-SUMMARY
-[2–3 sentences. Frame specifically around the call.]
-
-DECISIONS REQUIRED FROM THE PARTNER IN THIS CALL
-| Decision | Options to consider | LPM recommendation | Why now |
-|---|---|---|---|
-
-INFORMATION THE PARTNER MAY NOT HAVE
-Items that have come in direct to the LPM, client-side dynamics the 
-partner has not seen, emerging risks the LPM has spotted. Flagged as 
-"worth raising".
-
-| Item | Source | Why the partner should know |
-|---|---|---|
-
-LIKELY PARTNER QUESTIONS WITH PREPARED ANSWER LINES
-3–5 questions the LPM anticipates the partner asking. Each with a 
-prepared answer line — not a script, a prompt.
-
-| Question | Answer line |
-|---|---|
-
-DELIVERABLES — DUE THIS WEEK AND NEXT
-[Standard table]
-
-ISSUES — CURRENT
-[Standard table]
-
-RISKS — PLAUSIBLE FUTURE
-[Standard table]
-
-SUPPORTING CONTEXT
-One paragraph each: current financial position, team state, client-side 
-activity. Enough to orient the partner if they ask.
-
-HANDOFFS
-[Standard table]
-```
-
-## Mode 4 Template Variation (Handoff briefing)
-
-Same header with **Handoff from**, **Handoff to**, **Effective date** added.
-
-```
-SUMMARY
-[3–5 sentences. What this matter is. Where it is today. What is 
-coming up in the handoff window. Anything the receiving LPM 
-should know before opening the matter files.]
-
-DELIVERABLES — NEXT 2–4 WEEKS
-The operational spine of the handoff. The receiving LPM needs to not 
-drop any of these.
-
-| # | Deliverable | Owner | By when | Status | Context |
-|---|---|---|---|---|---|
-
-ISSUES — CURRENT
-Problems in flight that need continued management. Context sufficient 
-for the receiving LPM to either act or form questions.
-
-| Issue | Status | Mitigation in progress | What is needed next |
-|---|---|---|---|
-
-RISKS — PLAUSIBLE FUTURE
-Problems that may materialise in the handoff window. Context for 
-mitigation.
-
-| Risk | Signal | Mitigation context | Watch this specifically |
-|---|---|---|---|
-
-OUTSTANDING COMMITMENTS
-Commitments the outgoing LPM has made that the receiving LPM must 
-honour. From emails, calls, meetings — not necessarily documented 
-in a tracker.
-
-| Commitment | To whom | By when | Context |
-|---|---|---|---|
-
-WHAT IS NOT VISIBLE IN THE MATTER FILES
-Do not populate this section from inference or from the 
-correspondence. This section contains only content the outgoing 
-LPM provides in response to direct prompts. If the outgoing LPM 
-has not provided this content, replace this entire section with 
-the prompting questions listed in Domain Knowledge below. Do not 
-fabricate tacit knowledge. Do not infer relationship dynamics, 
-communication preferences, or partner behaviour from the tone or 
-content of emails.
-
-The tacit knowledge. Relationship dynamics, patterns of behaviour, 
-unwritten context, partner preferences, client quirks. The 
-outgoing LPM knows these; they are not in the documents.
-
-Examples of what to include:
-- How specific client contacts prefer to be communicated with
-- Patterns of behaviour on the other side (counterparty, LC, regulator)
-- Partner preferences on briefings, updates, and escalation timing
-- Client-side politics the receiving LPM should be aware of
-- Items the partner knows but that are not in correspondence
-
-WHO TO CALL
-By issue type. Name the person, not the role.
-
-| If this comes up | Call | Context |
-|---|---|---|
-
-CURRENT FINANCIAL POSITION
-Brief. WIP, plan, current variance and its nature, forward 
-exposures, any fee conversations pending.
-
-STAKEHOLDER TONE SNAPSHOT
-Current tone of relationships with key stakeholders. One line each.
-
-- Client GC: [tone and current engagement]
-- Client deal lead: [tone and current engagement]
-- Lead partner: [posture on matter, any watch items for the LPM relationship]
-- Key external counsel: [tone, responsiveness, any issues]
-
-SCHEDULED TOUCHPOINTS — NEXT 4 WEEKS
-Calls, meetings, deliverable dates, external milestones.
-
-HANDOFFS
-Single-matter skills to invoke as follow-through (e.g. for the 
-first week of the receiving LPM's tenure).
-
-| Skill | Trigger | Priority |
-|---|---|---|
-
-End of handoff briefing.
-```
-
-## Domain Knowledge
-
-### Working view, not report
-
-The output is for the LPM's consumption. No managed-confidence tone. No softening language. No partner-sign-off framing. If the matter is at 91% of cap with Phase 3 not started, say so plainly. If the partner has not delivered on a Friday commitment, say so.
-
-The failure mode is the drill-down drifting into status-report tone. Once it looks like a report, it gets used like a report — circulated, sanitised, partner-reviewed. That is not what this skill produces.
-
-### Open decisions vs live items
-
-Open decisions are pending judgments — someone needs to decide something. Live items are actions underway — things in motion, deliverables in train.
-
-A drill-down that conflates them loses the critical signal. "Local counsel preparing Swiss supplementary submission" is a live item (deliverable). "Decision whether to split Czech to Phase 3 or re-sequence" is an open decision. The first needs tracking; the second needs someone's attention.
-
-In Modes 1, 3, and 4, both appear but in different sections. In Mode 2, open decisions are the spine.
-
-### Issues vs risks — the taxonomy matters
-
-Same taxonomy as `daily-briefing` and `risk-and-issues-manager`:
-
-- **Issues** are confirmed problems requiring action now
-- **Risks** are plausible future problems requiring monitoring
-
-Silence on its own is a risk. Confirmation promotes it to an issue.
-
-### Deliverables with dates and owners
-
-The test for whether a deliverable row earns its place is: does it have a date and an owner? If yes, it is a deliverable. If no, it is either an aspiration or a topic. Deliverables without dates and owners do not appear in the deliverables section — they either get assigned in the output or are moved to Issues/Risks as appropriate.
-
-### Financial position — headline only
-
-Section 6 (Financial Position) is one paragraph. WIP against plan, variance and its nature, forward exposures. Do not reproduce detailed variance analysis — the LPM invokes `budget-and-fee-manager` for that.
+Section 6 is one paragraph. Detailed variance analysis lives in budget-and-fee-manager. Drill-downs that attempt full financial analysis become long and duplicative and destroy the working-surface shape.
 
 ### Cross-matter context — no invention
 
-Cross-matter context is limited to genuine connections: shared partner, shared LPM, same client, same regulatory overlay, same counterparty. If none present, state "No notable cross-matter context" and move on. Do not manufacture connections. Do not generate cross-matter context from matter-type assumptions or general knowledge. Cross-matter context comes only from input data about other specific matters. If no other matter data is provided, state "No notable cross-matter context" and move on. The fabrication path is inventing plausible connections from the matter type — do not do this.
+Cross-matter context in the drill-down is limited to genuine connections (shared partner, shared LPM, same client, same regulatory overlay, same counterparty). Empty section is legitimate; fabricated connections are not.
 
-### Mode 4 — what is not visible in the files
+### Calendar as anchoring mechanism in Mode 3 (Phase 3 decision)
 
-The hardest and most valuable section of the handoff briefing. Relationship dynamics, unwritten context, patterns of behaviour, tacit knowledge. Prompts for the outgoing LPM:
+Calendar integration in Mode 3 serves a different function than in daily-briefing. Daily-briefing uses calendar to surface the day's primary scheduling constraint. Mode 3 uses calendar to establish an information baseline: when was the last call with this partner, and what has arrived since then?
 
-- Is there a client contact with specific communication preferences? (How short should emails be? Does she prefer a morning or afternoon call? Is there a tone that works and one that doesn't?)
-- Is there a partner preference worth noting? (Does JMW want briefing 20 minutes before client calls? Does MKT dislike surprises in steering committees? Does AHL want analysis memos or bulleted summaries?)
-- Is there a pattern on the other side? (Does the opposing counsel typically respond within 48 hours, or are they chronically slow? Has the client GC historically pushed back on fee letters?)
-- Is there client-side politics? (Is the deal lead aligned with the GC, or is there friction? Is the CFO a blocker on finance decisions?)
-- Are there items the partner knows but that are not documented? (Conversations between partners at a dinner, a board-level conversation, a prior relationship history with the client?)
+The last touchpoint date anchors INFORMATION THE PARTNER MAY NOT HAVE. Without it, that section is a generic list of recent developments. With it, the section is specifically scoped: items arriving since the last call are the partner's information gap. The calendar data makes the section structurally precise rather than editorially approximate.
 
-If the outgoing LPM does not provide this content, the skill prompts for it explicitly before producing Mode 4. This is the one area where a placeholder is not acceptable — the receiving LPM needs the tacit knowledge or the handoff has failed.
+This is a more subtle use of calendar data than daily-briefing's imminence ranking — it shapes the framing of another section rather than populating a dedicated calendar section. The RECENT PARTNER TOUCHPOINTS section at the top of the Mode 3 template establishes the baseline; INFORMATION THE PARTNER MAY NOT HAVE uses it.
 
-### Attribution to named individuals
+Mode 4's SCHEDULED TOUCHPOINTS section already existed in the template as a manually populated section. Calendar retrieval in connected mode populates it from live data rather than requiring the outgoing LPM to list meetings manually — a modest but useful reduction in handoff preparation effort.
 
-Substantive analysis or recommendations from named individuals are attributed by name in the relevant section. Generic attribution to "the team" is the failure mode.
+---
 
-## Output Format
+## Design Principles Applied
 
-**.docx by default.** All outputs are .docx unless the user explicitly requests markdown.
+- **DP-26 (Global input classification).** Four-step classification: matter count, mode routing, audience check, input tagging. Classification fires before mode selection.
+- **DP-27 (Template skeletons).** All four modes use explicit populated templates with labelled sections.
+- **Identifier gate — harder than default.** Matter identifiers (client name, client number, matter name, matter number) required before output. Hard gate — do not produce until confirmed.
+- **Produce-don't-ask.** No conditional offers. Produce the .docx.
+- **Summary label.** Not "BLUF".
+- **Handoff language alignment.** Handoff targets (scope-change-controller, risk-and-issues-manager, status-report-drafter, local-counsel-manager, budget-and-fee-manager, stakeholder-comms-planner, timeline-generator, resource-planner) use invocation language the adjacent skills expect.
+- **Source tag preservation.** Input tags (`[FROM LC]`, `[CLIENT]`, `[PARTNER]`) preserved in attribution, not stripped.
+- **No named firms.** Domain knowledge and templates generic.
+- **Calendar as anchor, not decoration (Phase 3).** Calendar data in Mode 3 establishes the partner information baseline — last touchpoint date scopes INFORMATION THE PARTNER MAY NOT HAVE. Calendar data in Mode 4 populates SCHEDULED TOUCHPOINTS from live data rather than manual input. If calendar is unavailable, sections state so explicitly and fall back to correspondence inference.
 
-**Produce, do not ask.** Produce on invocation. No conditional offers.
+---
 
-**Label is "SUMMARY", not "BLUF".**
+## Phase 1 Test Prompts
 
-**No preamble.** Output opens with the identifier header.
+Each test prompt is run by the builder against the SKILL.md content as a simulation. Simulation is labelled explicitly — not a skill invocation.
 
-**Placeholders for unknowns** (except Mode 4 "what is not visible" — see above).
+### TP-1 — Mode 1: Standard drill-down on Meridian (heavy, Amber matter)
 
-## LPM vs Attorney Boundary
+**Test prompt:** Paste Meridian Industrial AG inputs from the portfolio pack (week 6 reorg scenario, multi-jurisdictional, Amber). Prompt: *"Drill into Meridian."*
 
-Drill-downs surface matters requiring attorney judgment (legal strategy, client advice framing, privileged communications) but do not offer legal analysis. The skill routes those items to the lead partner for decision via the Partner Attention section — it does not opine.
+**Eval assertions:**
+- ✅ Mode 1 fires
+- ✅ Matter identifiers requested before production OR taken from inputs if present
+- ✅ Output opens with identifier header including Invocation Context
+- ✅ SUMMARY is 2–3 sentences, direct, no hedging
+- ✅ DELIVERABLES section populated with 3+ rows — each with owner and by-when
+- ✅ ISSUES section distinguishes from Risks (Swiss ruling slip = issue; Poland LC non-response at 8+ days = risk ratcheting toward issue)
+- ✅ RISKS section frames plausibly-future items (Italian scope addition, Czech FDI regime exposure)
+- ✅ OPEN DECISIONS section separate from Deliverables
+- ✅ SCOPE SIGNALS table populated (Italian real estate — adding; Czech FDI — regulatory-driven)
+- ✅ FINANCIAL POSITION is one paragraph only — does not reproduce full variance analysis
+- ✅ TEAM AND STAKEHOLDER STATE is brief (1–3 lines per sub-section)
+- ✅ CROSS-MATTER CONTEXT identifies Westcliff as the other Amber matter under same LPM OR states "no notable cross-matter context" honestly if portfolio context not provided
+- ✅ HANDOFFS names specific skills with matter triggers
+- ✅ Total length 2–3 pages
 
-## Cross-Skill Handoffs
+### TP-2 — Mode 1: Standard drill-down on Nexus (Green, quiet matter)
 
-matter-drill-down is invoked from `daily-briefing`, from LPMHub, or directly. It hands off to:
+**Test prompt:** Paste Nexus Life Sciences inputs (one email from Schmid + one internal note confirming QA Wednesday). Prompt: *"Drill into Nexus."*
 
-- Formal scope change assessment → `scope-change-controller`
-- RAID update → `risk-and-issues-manager`
-- Status report for distribution → `status-report-drafter`
-- LC escalation or non-response pattern → `local-counsel-manager`
-- Detailed financial analysis → `budget-and-fee-manager`
-- Client comms plan or deck → `stakeholder-comms-planner`
-- Timeline impact analysis → `timeline-generator`
-- Team or cover arrangements → `resource-planner`
+**Eval assertions:**
+- ✅ Mode 1 fires
+- ✅ Identifier header populated
+- ✅ SUMMARY is 2 sentences — short, current position clear
+- ✅ DELIVERABLES has 1–2 rows (QA Wednesday; submission 5 May)
+- ✅ ISSUES section states "No current issues" — does not fabricate
+- ✅ RISKS section states "No significant risks this period" — does not invent
+- ✅ OPEN DECISIONS section likely empty or 1 row
+- ✅ Total length ≤1.5 pages (restraint applied — not padded to match Meridian)
+- ✅ No cross-matter context manufactured
 
-Each handoff in the output names the trigger and priority.
+### TP-3 — Mode 3: Partner prep on Meridian ahead of JMW call
 
-## M365 Connected Mode
+**Test prompt:** Same Meridian inputs plus context: *"I have a call with JMW tomorrow to discuss the Italian real estate scope question and the Czech FDI watch item. Prep me."*
 
-**Mode 1 (Standard drill-down).** Connected mode queries the single matter folder in Outlook, retrieves correspondence in a default window (last 7 days unless user specifies), and produces the drill-down without user paste.
+**Eval assertions:**
+- ✅ Mode 3 fires
+- ✅ Identifier header includes Partner, Call purpose, Call timing
+- ✅ SUMMARY framed specifically around the call
+- ✅ DECISIONS REQUIRED FROM THE PARTNER section — Italian scope addition decision; Czech FDI sequencing decision if analysis is adverse
+- ✅ INFORMATION THE PARTNER MAY NOT HAVE section — items direct to the LPM, client-side dynamics the partner has not seen
+- ✅ LIKELY PARTNER QUESTIONS with answer lines (3–5 questions)
+- ✅ Deliverables, Issues, Risks retained (standard tables)
+- ✅ Supporting context paragraphs (financial, team, client)
+- ✅ Total length 2 pages
 
-**Mode 2 (Decision-first).** Same retrieval pattern.
+### TP-4 — Mode 4: Handoff briefing for Meridian (simulating Scott going on 1-week leave)
 
-**Mode 3 (Partner prep).** Same retrieval pattern, plus Calendar integration (if available) to identify the last touchpoint with the named partner.
+**Test prompt:** Same Meridian inputs plus context: *"I'm going on leave next week. Handing Meridian to Priya Ramanathan for cover. Produce a handoff briefing."*
 
-**Mode 4 (Handoff briefing).** Extended retrieval window — last 30 days minimum — to capture outstanding commitments and pattern signals. The "what is not visible in the files" section still requires the outgoing LPM's input; connected mode cannot generate that content.
+**Eval assertions:**
+- ✅ Mode 4 fires
+- ✅ Identifier header includes Handoff from, Handoff to, Effective date
+- ✅ SUMMARY is 3–5 sentences — what the matter is, where it is, what is coming up in the handoff window
+- ✅ DELIVERABLES — NEXT 2–4 WEEKS populated with 5+ rows, each with owner, by-when, status, context
+- ✅ ISSUES — CURRENT populated with in-flight problems, each with mitigation in progress and what is needed next
+- ✅ RISKS — PLAUSIBLE FUTURE populated with plausible items and watch-this-specifically guidance
+- ✅ OUTSTANDING COMMITMENTS populated — commitments from emails and calls not documented in a tracker
+- ✅ WHAT IS NOT VISIBLE IN THE MATTER FILES — skill prompts the outgoing LPM for tacit content OR asks specific prompting questions (communication preferences, partner preferences, patterns on the other side, client-side politics, partner-known-but-not-documented items)
+- ✅ WHO TO CALL table populated by issue type with named people
+- ✅ CURRENT FINANCIAL POSITION is brief
+- ✅ STAKEHOLDER TONE SNAPSHOT populated with one line per key contact
+- ✅ SCHEDULED TOUCHPOINTS — NEXT 4 WEEKS populated
+- ✅ HANDOFFS section populated for first-week invocations
+- ✅ Total length 4–6 pages
 
-**Manual mode fallback.** All four modes operate fully on pasted input. Connected mode is an efficiency enhancement.
+### TP-5 — Mode 2: Decision-first on Meridian
 
-**Future connectors.** A DMS or practice management system connector would enable matter baseline retrieval (phase, fee model, WIP) from the system of record. A Calendar connector would improve Mode 3 quality by identifying last-partner-touchpoint directly. Both are Phase 3.
+**Test prompt:** Same Meridian inputs, prompt: *"What do I need to decide on Meridian?"*
 
-## Time-Sensitive Assumptions
+**Eval assertions:**
+- ✅ Mode 2 fires
+- ✅ Identifier header populated
+- ✅ OPEN DECISIONS — EXPANDED is the spine of the output
+- ✅ Each decision has: decision statement, owner, by-when, options, current state, blockers, LPM recommendation
+- ✅ ISSUES and RISKS retained as standard tables (they constrain/inform decisions)
+- ✅ Deliverables, Team, Finance, Cross-matter context collapsed to one line each
+- ✅ Total length 1.5–2 pages
 
-- Matter identifier format assumes Intapp Open or equivalent practice management system
-- Connected mode patterns assume M365/Outlook
-- Mode 4's tacit knowledge elicitation assumes the outgoing LPM is available to respond to prompts. If the outgoing LPM is unavailable (sudden leave, departure), Mode 4 output is necessarily incomplete and the skill flags this explicitly.
+### TP-6 — Audience check: status report request
+
+**Test prompt:** Paste Meridian inputs, prompt: *"Produce a status report on Meridian for JMW to send to the client."*
+
+**Eval assertions:**
+- ✅ Input Classification Step 3 fires — audience is specified as partner/client
+- ✅ Skill does NOT produce a drill-down
+- ✅ Skill routes to status-report-drafter with handoff language
+- ✅ No drill-down output produced
+
+### TP-7 — Multi-matter input check
+
+**Test prompt:** Paste the full six-matter portfolio pack, prompt: *"Drill into Meridian."*
+
+**Eval assertions:**
+- ✅ Input Classification Step 1 detects multi-matter input
+- ✅ Skill filters to Meridian content only for the drill-down
+- ✅ Cross-matter context section populated from the other matter data (correctly — not fabricated)
+- ✅ Mode 1 output produced on Meridian using standard template
+
+### TP-8 — Missing identifier gate
+
+**Test prompt:** Paste Meridian emails with no matter number reference, prompt: *"Drill into Meridian."*
+
+**Eval assertions:**
+- ✅ Identifier gate fires — skill asks for client name, client number, matter name, matter number before production
+- ✅ Does not proceed with fabricated identifiers
+- ✅ If user responds with confirmation (even "use placeholders"), skill proceeds with clear placeholder labelling
+
+### TP-9 — Mode 3 calendar integration (Phase 3)
+
+**Test prompt:** Same Meridian inputs as TP-3, M365 Calendar connector active. Calendar data includes: JMW call 2 May (15 days ago, Meridian regulatory review), JMW call 28 April (19 days ago, scope discussion), and upcoming call tomorrow at 14:00. Prompt: *"Prep me for my call with JMW tomorrow on Meridian — Italian RE scope question and Czech FDI."*
+
+**Eval assertions:**
+- ✅ Mode 3 fires
+- ✅ `outlook_calendar_search` called for JMW over past 30 days and upcoming 14 days
+- ✅ RECENT PARTNER TOUCHPOINTS section populated: two past touchpoints with date, meeting name, what was covered, follow-up identified; upcoming call confirmed with date, time, format
+- ✅ INFORMATION THE PARTNER MAY NOT HAVE is anchored to "since last partner touchpoint (2 May)" — items arriving after that date flagged; items predating it not included unless materially changed
+- ✅ If calendar unavailable: RECENT PARTNER TOUCHPOINTS states "Calendar not retrieved — confirm last touchpoint date from correspondence before producing this section"; INFORMATION THE PARTNER MAY NOT HAVE falls back to unanchored list of recent developments
+- ✅ No invented touchpoints; no meetings inferred from correspondence references alone
+
+---
+
+## Phase 1 Simulation Results
+
+All eight test prompts simulated by builder on 19 April 2026. Each labelled as builder simulation, not skill invocation.
+
+| TP | Mode | Result | Key observation |
+|---|---|---|---|
+| TP-1 | Mode 1 (heavy) | PASS | Full template populated. 7 deliverables, 2 issues, 3 risks, 4 decisions. ~2.5 pages. |
+| TP-2 | Mode 1 (quiet) | PASS | Restraint held. ~0.75 pages. Empty sections stated plainly. No fabrication. |
+| TP-3 | Mode 3 (partner prep) | PASS | Call-specific framing. 2 decisions, 3 info items, 4 questions. ~2 pages. |
+| TP-4 | Mode 4 (handoff) | PASS | Load-bearing mode. 9 deliverables, tacit knowledge prompts, who-to-call table. ~5 pages. |
+| TP-5 | Mode 2 (decision-first) | PASS | Decisions as spine. 4 decisions fully expanded. Supporting sections collapsed. ~2 pages. |
+| TP-6 | Routing (audience) | PASS | Audience check fired. Routed to status-report-drafter. |
+| TP-7 | Routing (multi-matter) | PASS | Filtered to Meridian. Cross-matter context from Westcliff genuine. |
+| TP-8 | Routing (identifier) | PASS | Gate fired. Asked for missing identifiers. |
+
+Three pre-Phase-2 patches applied based on daily-briefing failure patterns:
+1. Mode 4 "What Is Not Visible" fabrication prohibition placed inside template skeleton
+2. Audience check (Step 3) strengthened with named failure mode
+3. Cross-matter context fabrication path named explicitly
+
+---
+
+## Phase 2 Test Results
+
+[Placeholder. Phase 2 runs by user in clean Claude.ai session with skill installed. One test per fresh conversation. User pastes output back; builder records PASS/PARTIAL/FAIL against each assertion with specifics.]
+
+### Phase 2 setup
+- New Claude.ai session
+- Skill installed via Settings → Capabilities → Skills (not pasted as instructions)
+- No project context, no prior conversation history
+- Each test prompt in its own fresh conversation
+
+### TP-1 — Mode 1 heavy matter — PASS (Opus 4.6)
+Full template populated. 7 deliverables, 3 issues, 3 risks, 4 decisions, 2 scope signals, 5 handoffs. ~3 pages. All sections present in correct order. Identifier header complete. Summary ran to 5 sentences (template says 2-3) but all content is substantive — consistent model behaviour, not patch-worthy. WIP placed in Issues (defensible: 12% overrun is confirmed state, not future risk). Italian RE placed in both Issues and Scope Signals with different framing — good structural discipline. Cross-matter context correctly states "No notable cross-matter context." Financial position is one paragraph. Conversational commentary post-document is sharp and operationally useful.
+
+### TP-2 — Mode 1 restraint — PASS (Opus 4.6)
+Restraint test passed. ~1.5 pages vs TP-1's ~3 pages. 3 deliverables (eval expected 1-2 — third row is genuine intermediate step, not padding). Issues: "No current issues." Two low-probability risks populated rather than stating "no significant risks" — both grounded in inputs (QA finding something, Homburger terminology observations). No decisions. No scope signals. One conditional handoff. Length proportionate to matter weight. Model did not normalise across matters.
+
+### TP-3 — Mode 3 partner prep — PASS (Opus 4.6) [Phase 1 simulation / Phase 2 paste-mode]
+Mode 3 template used correctly. Header includes Partner (JMW), Call purpose, Call timing. 3 decisions in DECISIONS REQUIRED section with options, LPM recommendation, and "why now". 4 items in INFORMATION THE PARTNER MAY NOT HAVE — strongest: Italian RE was explicitly excluded at baseline, reframing Wolfgang's email. 5 likely partner questions with substantive answer lines. Standard tables retained (6 deliverables, 3 issues, 3 risks). Supporting context present. ~4 pages (eval said 2 — Mode 3 template adds three sections on top of standard tables; 2 pages was too tight for a heavy Amber matter. Eval assertion revised, not skill).
+
+Note: Phase 2 pass was against pasted input without M365 connector. Phase 3 connected-mode testing revealed two additional failure modes — see Phase 3 section.
+
+### TP-4 — Mode 4 handoff — PASS (Opus 4.6)
+Load-bearing mode. Critical Patch 1 held: "What Is Not Visible" section produced 6 prompting questions rather than fabricating tacit knowledge. Preamble: "The following prompts need answers from the outgoing LPM before this section is complete." No inferred relationship dynamics, no fabricated communication preferences, no manufactured client politics. 7 deliverables with context column. 3 issues with four-column format. 3 risks with "Watch this specifically." 4 outstanding commitments from emails/calls. 7 WHO TO CALL entries by issue type. Stakeholder tone snapshot for 5 contacts. 8 scheduled touchpoints. 5 handoffs. ~5 pages. Summary ran to two paragraphs — second paragraph (Priya's four immediate priorities) is genuinely useful, not padding. Cross-matter context: "No other matters provided for cross-referencing." Conversational commentary pre-document is well-calibrated (flags overdue items, recommends 15-minute handoff call).
+
+### TP-5 — Mode 2 decision-first — FAIL / V1 LIMITATION (Opus 4.6)
+Three iterations of patches, all failed. Model produces conversational advisory prose rather than a .docx with the Mode 2 template skeleton. Iteration 1: produce-now directive in template variation section — model commits to prose before reaching it. Iteration 2: directive moved to mode definition (line 85) — still overridden. Iteration 3: directive added at input classification Step 2 routing — still overridden. Model's trained prior to answer "What do I need to decide?" as a conversational question is stronger than the skill directive. Content quality is consistently high (correct decisions, sound options, defensible recommendations) but format is wrong. Declared v1 limitation after three iterations per canonical process. Workaround: prompt with "Produce a decision-first drill-down on [matter] as a .docx" rather than natural-language question. Usage note added to README.
+
+### TP-6 — Audience check routing — FAIL / V1 LIMITATION (Opus 4.6)
+Two iterations of patches on the audience check gate (Step 3), both failed. Iteration 1: strengthened prohibition with named failure mode ("do not produce a drill-down and adjust the tone"). Iteration 2: provided an explicit routing response template for the model to produce instead. Both times the model detected the audience correctly, produced a high-quality client-facing status report, and provided appropriate editorial commentary — but did not route to status-report-drafter. status-report-drafter was installed and available in the test environment, so this is a genuine routing failure, not an environmental artefact. Root cause: same gate-skipping pattern as Mode 2. Model's helpfulness prior overrides routing instructions when it has the capability to produce the requested output. The model absorbs the adjacent skill's function rather than deferring to it. Workaround: invoke status-report-drafter directly rather than asking matter-drill-down to produce a status report.
+
+### TP-7 — Multi-matter filter — PASS (Opus 4.6)
+Full six-matter portfolio pack pasted with "Drill into Meridian" prompt. Model correctly filtered to Meridian content for all substantive sections. Cross-matter context populated with genuine Westcliff connection (same LPM, competing Monday deadline, bandwidth conflict). No fabricated connections to Aldwych, Nexus, Altissima, or Hartwick. Full Mode 1 template produced. Conversational commentary also identified the Westcliff bandwidth conflict.
+
+### TP-8 — Identifier gate — FAIL (Opus 4.6)
+Identifier gate did not fire. Model was given Meridian emails only (no portfolio roster, no explicit matter number). Model inferred identifiers from correspondence content (client number M20481, matter number M20481.002) and produced the full drill-down without asking. Same gate-skipping pattern as TP-5 and TP-6: model overrides boundary instructions when it has enough information to produce the requested output. Low operational risk — inferred identifiers are likely correct in practice, and in real usage the matter number would almost certainly appear in correspondence. Gate exists for data hygiene in formal .docx records. Not worth a patch iteration given the consistent gate-skipping pattern. Usage note added to README.
+
+---
+
+## Phase 3 — Calendar Integration (11 May 2026)
+
+### Scope decision
+
+Targeted edit, not rebuild. The four-mode architecture, deliverables/issues/risks spine, and Mode 4 tacit knowledge discipline are tested and working. Calendar integration is confined to Mode 3 (primary use case) and Mode 4 (SCHEDULED TOUCHPOINTS population). Mode 1 and Mode 2 are out of scope for this pass — calendar is less structurally relevant there and headroom was limited (40 lines).
+
+### Design decisions
+
+| Decision | Choice | Rationale |
+|---|---|---|
+| Mode 3 calendar placement | New RECENT PARTNER TOUCHPOINTS section, between SUMMARY and DECISIONS REQUIRED | Partner touchpoint history is framing context that shapes the rest of the Mode 3 output. Placing it near the top means the LPM reads it before entering the decisions and information sections. |
+| Last touchpoint as anchor | INFORMATION THE PARTNER MAY NOT HAVE explicitly scoped to "since last partner touchpoint" | Without the anchor, the section is a generic list of recent developments. With it, the section is precisely scoped: items arriving since the last call are the partner's actual information gap. This makes the calendar data operationally load-bearing, not decorative. |
+| Calendar windows for Mode 3 | Past 30 days / upcoming 14 days | Past 30 days captures the realistic partner-touchpoint horizon for active matters. Upcoming 14 days confirms the call being prepped for and any adjacent touchpoints. |
+| Mode 4 calendar | Note in Connected Mode that calendar populates SCHEDULED TOUCHPOINTS | SCHEDULED TOUCHPOINTS already exists as a template section. Calendar retrieval populates it from live data rather than requiring manual input from the outgoing LPM. No template change required. |
+| Modes 1 and 2 | Out of scope | Mode 1: calendar would add upcoming meetings context — useful but not architecturally significant for a single-matter drill-down. Mode 2: calendar not relevant to decision-first framing. Both deferred as Phase 3 backlog items. |
+
+### Changes made to SKILL.md v1.0 → v1.1.0
+
+| Location | Change | Type |
+|---|---|---|
+| YAML version | 1.0.0 → 1.1.0 | Update |
+| Mode 3 template | Added RECENT PARTNER TOUCHPOINTS section (past 30 days table + upcoming call confirmation + no-data fallback) between SUMMARY and DECISIONS REQUIRED | Addition |
+| Mode 3 template | Updated INFORMATION THE PARTNER MAY NOT HAVE header to "Items that have arrived or developed since the last partner touchpoint (see above)" | Update |
+| M365 Connected Mode — Mode 3 | Replaced one-line placeholder with actual instructions: `outlook_calendar_search` for partner name, two windows (past 30 days / upcoming 14 days), anchor relationship to INFORMATION THE PARTNER MAY NOT HAVE made explicit | Update |
+| M365 Connected Mode — Mode 4 | Added: `outlook_calendar_search` for matter keyword, upcoming 4 weeks, populates SCHEDULED TOUCHPOINTS | Addition |
+| M365 Connected Mode — Manual fallback | Updated to note calendar entries can be pasted directly | Update |
+| Future connectors | Removed calendar reference (no longer Phase 3). DMS reference retained. | Update |
+
+**Line count:** 460 → 470 (10 lines added, 30 lines remaining to 500 limit)
+**Description:** Unchanged at 867 characters
+
+### Phase 3 test prompts
+
+TP-9 defined above. Not yet run. Phase 3 testing pending clean-session validation with M365 Calendar connector active.
+
+### Phase 3 connected-mode testing — TP-4 and TP-3 (11 May 2026)
+
+**TP-4 connected mode (Mode 4 handoff, no paste) — PASS**
+
+Run against live Outlook data with M365 connector active. No input pasted. Skill retrieved Meridian correspondence from the matter folder (8 emails, all dated 18 April — matter folder unfiled since then), then correctly broadened search across mailbox to find 10 May developments (Czech FDI, BaFin filing, Polish LC, Helena status call). Calendar queried for 11 May–8 June window; 2 events returned, both appearing in SCHEDULED TOUCHPOINTS.
+
+Connected-mode-specific findings not visible in paste mode:
+- Matter folder hygiene gap caught and elevated to Issue #6 — three weeks of substantive correspondence unfiled, creating a handoff hazard. Specific action item: file or brief Priya to read Inbox + Sent Items, not the folder.
+- SCHEDULED TOUCHPOINTS populated from calendar (2 events) plus correspondence-derived dates. Phase 3 change for Mode 4 confirmed working.
+- WHAT IS NOT VISIBLE gate held correctly — skill prompted for tacit knowledge before producing; populated verbatim from user input.
+- Wolfgang Steiner identity ambiguity (two email addresses across source data) flagged in Deliverable #10 with footnote.
+
+Minor format note: SCHEDULED TOUCHPOINTS rendered as prose list rather than table. Content complete and correct; format departure not patch-worthy.
+
+**TP-3 connected mode (Mode 3 partner prep) — FAIL (iteration 1) → FAIL (iteration 2) → PASS (iteration 3)**
+
+Three iterations to resolve two independent failure modes.
+
+**Iteration 1 — FAIL.** Conversational prose output despite Phase 3 calendar additions to SKILL.md. Template did not fire. M365 connector not invoked — skill went to memory instead. Root causes: (1) no mandatory retrieval gate before production; (2) Mode 3 template variation header too weak to override conversational prior.
+
+**Patches applied (iteration 1):**
+- Input Classification Step 2 Mode 3 routing line: added produce-now directive
+- Mode 3 definition Output section: rewrote from bullet list to explicit .docx directive with named failure modes
+- Mode 3 Template Variation header: added strong produce-now directive matching Mode 2 header strength
+
+**Iteration 2 — FAIL.** Three-point directive patch applied. Template still did not fire. M365 connector still not invoked — skill stated "no active source material" and went to past-conversation memory. Root causes: (1) retrieval gate still absent — no instruction forcing connector invocation before production; (2) header-first forcing function not yet applied — model still chose conversational format before committing to document structure.
+
+**Patches applied (iteration 2):**
+- Before Starting Any Mode: added mandatory M365 retrieval step — "If M365 connector is available, invoke `outlook_email_search` for the matter name before producing output in any mode. Do not ask for pasted inputs if connected mode is available — retrieve first, then produce."
+- Input Classification Step 2 Mode 3: added explicit retrieval instruction to routing line
+- Mode 3 definition Output section: added header-first forcing function — "The first content you produce is the identifier header block — not a comment, question, flag, or advisory text. Starting with the header commits you to document format. Conversational preamble before the header is the failure mode."
+
+**Iteration 3 — PASS.** Both patches held.
+
+Retrieval: skill invoked `outlook_email_search` (Meridian, after 8 May) and `outlook_calendar_search` (12–13 May, JMW as attendee) before producing. Sources checked block confirms retrieval.
+
+Template: .docx produced with full Mode 3 structure. Identifier header, SUMMARY, RECENT PARTNER TOUCHPOINTS, DECISIONS REQUIRED (6 decisions with options/recommendation/why-now), INFORMATION THE PARTNER MAY NOT HAVE (anchored to since last JMW touchpoint), LIKELY PARTNER QUESTIONS (5 with answer lines), spine tables (7 deliverables, 3 issues, 4 risks), supporting context, 5 handoffs.
+
+RECENT PARTNER TOUCHPOINTS: populated from Outlook. Calendar returned no JMW Meridian calls — correctly handled with fallback language: "calendar search for JMW as attendee on Meridian returned no results — calendar discipline may have slipped, or touchpoints are informal/phone." No data invented.
+
+INFORMATION THE PARTNER MAY NOT HAVE: anchor working — "items developing since JMW's last logged Meridian touchpoint (10 May email)."
+
+Calendar finding (no JMW call on tomorrow's calendar): flagged prominently in both SUMMARY and identifier header. Operationally correct — the call is either informal or the user was conflating with Wednesday's contingent call.
+
+Adaptive section added: "WHERE TO PUSH BACK ON JMW" — not in the Mode 3 template, added by skill as an additional section. Content is operationally the sharpest part of the brief. See Phase 3 backlog item 10.
+
+**What fixed it:** The header-first forcing function was the determining patch. Naming "conversational preamble before the header is the failure mode" and requiring the identifier header as the first production act committed the model to document format before it had the opportunity to go conversational. The mandatory retrieval gate fixed the separate connector invocation failure. Two distinct problems; two distinct fixes; both required for PASS.
+
+**Root cause pattern:** Mode 3's invocation pattern ("prep me for a call") sounds like a conversational question. The model's prior to answer it conversationally is strong — stronger than produce-now directives alone. The header-first forcing function changes the dynamic: once the model writes the identifier header, it is in document mode and the template follows naturally. This mirrors why Mode 4 has always worked — the detailed template makes document format the path of least resistance from the first line.
+
+**Line count after iteration 2 patches:** 474 lines (26 remaining to 500 limit).
+
+---
+
+## Open Items Post-Phase 2
+
+### V1 Limitation: Mode 2 prose-instead-of-template
+
+**What works:** Mode 2 correctly identifies open decisions, prioritises them, provides options and recommendations, and covers the right content.
+
+**What doesn't work:** Mode 2 does not reliably produce a .docx with the template skeleton (identifier header, structured decision entries, retained Issues/Risks tables, collapsed supporting sections). Three patch iterations failed across three interception points (template section, mode definition, input classification routing). The model's trained prior to answer natural-language decision questions as conversational advisory prose overrides the skill directive.
+
+**Workaround:** Prompt with explicit document-request language: "Produce a decision-first drill-down on [matter] as a .docx" rather than "What do I need to decide on [matter]?"
+
+**V2 approach:** Consider splitting Mode 2 into a dedicated template with a stronger skeleton that the model populates (similar to Mode 4's extended template), rather than defining it as a variation of Mode 1 with collapsed sections. Alternatively, test whether a worked example in the template section changes the behaviour.
+
+### V1 Limitation: Audience check routing (TP-6)
+
+**What works:** Model detects audience correctly and produces a high-quality client-facing status report with appropriate register and editorial judgment.
+
+**What doesn't work:** Model does not route to status-report-drafter. Two patch iterations failed. status-report-drafter was installed and available in the test environment, confirming this is a genuine routing failure, not an environmental artefact. Same gate-skipping pattern: model's helpfulness prior overrides routing instructions when it can produce the requested output.
+
+**Workaround:** Invoke status-report-drafter directly rather than requesting a status report via matter-drill-down.
+
+**V2 approach:** Cross-skill routing may require platform-level support (skill priority/conflict resolution) rather than text-based instructions within a single skill. Alternatively, test whether the routing holds when the prompt is ambiguous ("produce a report on Meridian") vs explicit ("produce a status report for JMW to send to the client").
+
+### Known issue: Identifier gate does not fire on inferrable identifiers (TP-8)
+
+Model infers identifiers from correspondence and proceeds without asking, even when identifiers are not explicitly provided. Low operational risk — inferred identifiers are typically correct. Gate exists for data hygiene in .docx records. Not worth patching given the consistent gate-skipping pattern across TP-5, TP-6, and TP-8.
+
+### Phase 3 backlog
+
+1. Mode 2 template strengthening (v2 approach above)
+2. Audience check routing — cross-skill routing mechanism (v2 approach above)
+3. Mode 3 page length calibration — eval assertion said 2 pages, actual output is 3-4 on heavy matters. Template structure inherently longer. Revise guidance, not skill.
+4. Summary length across all modes — model consistently writes 4-5 sentences rather than 2-3. Content is substantive. Monitor but do not patch unless it inflates further.
+5. ~~Connected mode testing (M365 Outlook retrieval)~~ — **complete.** TP-4 and TP-3 connected mode both validated (11 May 2026).
+6. Cross-model testing on Sonnet — daily-briefing validated cross-model; matter-drill-down should be tested on Sonnet for Modes 1, 3, 4
+7. Identifier gate hardening — test whether explicit "stop and ask" language in the gate fires more reliably, or whether this is a fundamental gate-skipping behaviour
+8. ~~Phase 3 clean-session testing~~ — **complete.** TP-4 PASS, TP-3 PASS (iteration 3).
+9. Mode 1 calendar — Upcoming meetings in the next week would add useful context to a standard drill-down. Out of scope for this pass given headroom constraints. Consider for a future pass.
+10. **"WHERE TO PUSH BACK" adaptive section** — Mode 3 TP-3 live test produced an unprompted "WHERE TO PUSH BACK ON JMW" section containing the sharpest operational content in the brief. Not in the Mode 3 template. Behaviour is correct and valuable; consider formalising as a standard Mode 3 section. Low priority — adaptive addition is working without instruction; encoding it formally risks over-specifying.
+
+---
+
+## Source Materials Used
+
+- `skill-build-process-template-v1.md` — canonical build process (v1.0)
+- `matter-intake-scoping-build-log.md` — canonical build log structure reference
+- `v1-skill-build-starter-prompt-v4_0.md` — Phase 1/2 process definition
+- `lpm-plugin-planning-v1_7.md` — status-report-drafter boundary language, cross-skill handoff patterns
+- `daily-briefing/SKILL.md` — adjacent skill boundary alignment (this skill is routed from daily-briefing Mode 2)
+- User calibration (17–19 April 2026) — deliverables/issues/risks spine; handoff briefing as constantly-triggered operational need requiring full Mode 4 build
+- `skill-build-process-template-v2.md` — Phase 3 process reference (May 2026)
+- `daily-briefing` Phase 3 pass (10 May 2026) — calendar integration patterns; anchor-relationship design principle
+
+## Build Artefacts
+
+- `matter-drill-down/SKILL.md` v1.2.0 (474 lines)
+- `matter-drill-down/matter-drill-down-build-log.md` (this file)
+
+README.md to be produced next.
